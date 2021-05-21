@@ -3,8 +3,10 @@
 #   https://github.com/jreese/markdown-pp
 
 import click
+import copy
 import cpig.loadInterface
-import sys
+import datamodel_code_generator
+import json
 import yaml
 
 def loadConfig(configFile) :
@@ -50,5 +52,21 @@ def cli(ctx, configFile, verbose, interface_name):
     cpig.loadInterface.interfaceDescription    
   )
   print("---------------------------------------------------------")
-  print(yaml.dump(jsonSchema))
+  print(json.dumps(jsonSchema))
   print("---------------------------------------------------------")
+  for aType, aDef in jsonSchema['$defs'].items() :
+    newJsonSchema = copy.deepcopy(jsonSchema)
+    for aKey, aValue in aDef.items() :
+      newJsonSchema[aKey] = copy.deepcopy(aValue)
+      newJsonSchema['title'] = aType
+    print(yaml.dump(newJsonSchema))
+    print("---------------------------------------------------------")
+    print(json.dumps(newJsonSchema))
+    print("---------------------------------------------------------")
+    try: 
+      datamodel_code_generator.generate(json.dumps(newJsonSchema))
+    except Exception as ex :
+      print("Error found while parsing the [{}] JSON type".format(aType))
+      print("  "+"\n    ".join(str(ex).split("\n")))
+      print("(It may have been inside a reference to another type)")
+    print("---------------------------------------------------------")
