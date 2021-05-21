@@ -61,8 +61,16 @@ def cli(ctx, configFile, verbose, interface_name):
       newJsonSchema['title'] = aType
     print(yaml.dump(newJsonSchema))
     print("---------------------------------------------------------")
-    print(json.dumps(newJsonSchema))
+    print(json.dumps(newJsonSchema, sort_keys=True, indent=2))
     print("---------------------------------------------------------")
+    with open('/tmp/silly.py', 'w') as outFile :
+      outFile.write("import yaml\n")
+      outFile.write("\n")
+      outFile.write("test = {}\n".format(json.dumps(newJsonSchema, sort_keys=True, indent=2)))
+      outFile.write("\n")
+      outFile.write("print(yaml.dump(test))\n")
+      outFile.write("\n")
+
     try: 
       datamodel_code_generator.generate(json.dumps(newJsonSchema))
     except Exception as ex :
