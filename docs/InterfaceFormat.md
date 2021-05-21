@@ -13,34 +13,38 @@ The embedded YAML code blocks describe sections of the overall interface
 in a precise *machine readable format* which is not too difficult for a 
 human developer to read and understand. 
 
-The outer level of the YAML for an interface consists of a YAML dictionary 
-containing four keys: 
+The outer level of the YAML for an interface consists of a dictionary 
+containing five keys: 
 
-1. **`jsonTypes`** The `jsonTypes` is a YAML dictionary of individual JSON 
-   types defined using a YAMLized JSON schema format
-   ([see below](#yamlized-json-schema-format))
+1. **`jsonSchemaPreamble`** The (optional) `jsonSchemaPreamble` is a 
+   dictionary of individual JSON schema preable definitions for the whole 
+   schema. 
 
-2. **`jsonExamples`** The `jsonExamples` is a YAML dictionary containing 
-   YAML arrays of JSON examples for each major JSON type. These examples 
-   can be used in automated testing of the interfaced components. 
+2. **`jsonSchemaDefs`** The `jsonSchemaDefs` is a  dictionary of 
+   individual JSON types defined using a YAMLized JSON schema format ([see 
+   below](#yamlized-json-schema-format)) 
 
-3. **`httpRoutes`** The `httpRoutes` is a YAML dictionary of individual HTTP 
-   routes. Each route object is a YAML dictionary of HTTP actions 
-   (GET/PUT). Each HTTP action is a YAML dictionary describing the 
-   route/action and the type of its expected JSON payload and response (if 
-   any). Each JSON type MUST be described in the `jsonTypes` dictionary. 
+3. **`jsonExamples`** The `jsonExamples` is a  dictionary containing 
+   arrays of JSON examples for each major JSON type. These examples can be 
+   used in automated testing of the interfaced components. 
+
+4. **`httpRoutes`** The `httpRoutes` is a  dictionary of individual HTTP 
+   routes. Each route object is a dictionary of HTTP actions (GET/PUT). 
+   Each HTTP action is a dictionary describing the route/action and the 
+   type of its expected JSON payload and response (if any). Each JSON type 
+   MUST be described in the `jsonSchemaDefs` dictionary. 
 
    **Question**: Since the http route orders tend to be significant, 
    should this be an ordered array (or can we simply order the keys)?
    
-   **Answer**: We will use a YAML dictionary for the collection of routes, 
+   **Answer**: We will use a  dictionary for the collection of routes, 
    but each route will have a numeric "priority" field. The collection of 
    routes will be sorted by priority and then the route (as a string). 
 
-4. **`natsChannels`** The `natsChannels` is a YAML dictionary of NATS 
-   channels. Each channel is a YAML dictionary describing the channel and 
-   the type of its expected JSON payloads and responses (if any). Each 
-   JSON type MUST be described in the `jsonTypes` dictionary. 
+5. **`natsChannels`** The `natsChannels` is a dictionary of NATS channels. 
+   Each channel is a dictionary describing the channel and the type of its 
+   expected JSON payloads and responses (if any). Each JSON type MUST be 
+   described in the `jsonSchemaDefs` dictionary. 
 
 The parsing and validation of the JSON payloads will be done using 
 [AJV](https://ajv.js.org/) (for JavaScript) and 
@@ -49,57 +53,30 @@ The parsing and validation of the JSON payloads will be done using
 
 ## YAMLized JSON schema format
 
-The YAML description of each JSON type is an abbreviated form of the full 
-[JSON schema](http://json-schema.org/). That is, once processed by the 
-interface generator, the result is a JSON schema format sufficient for the 
-use with both [AJV](https://ajv.js.org/json-schema.html) and 
+The YAMLized description of each JSON type is essentially that fragement 
+of the full [JSON schema](http://json-schema.org/) which is needed to 
+define *one* JSON type. Once processed by the interface generator, the 
+combination of the `jsonSchemaPreamble` and the `jsonSchemaDefs` is a JSON 
+schema format sufficient for the use with both 
+[AJV](https://ajv.js.org/json-schema.html) and 
 [datamodel-code-generator](https://koxudaxi.github.io/datamodel-code-generator/). 
 
-However, to allow a useful abbreviated JSON schema using YAML, we wrap all 
-JSON schema keywords with a leading and trailing underscore `_`. 
+Once processed into valid JSON schema, the `jsonSchemaDefs` definitions 
+are placed into a standard JSON schema `$defs` dictionary. This means the 
+cross references to types defined in this interface schema, can be done 
+using the standard (internal) reference notation: 
 
-JSON types consist of a YAML dictionary of properties. The key for each 
-field is the (string) *name* of the field. The value of each field is a 
-YAML dictionary consisting of: 
+```
+  $ref: "#/$defs/<nameOfJsonType>"
+```
 
-- **\_type\_**: the string name of the JSON type of the field. This string 
-                name may be for a simple or complex JSON type. Complex 
-                JSON types MUST be defined in the `jsonTypes` dictionary. 
-
-- **\_default\_**: an optional simple (string) expression which when 
-                   evaluated produces the default value. 
-
-- **\_items\_**: if *\_type\_* is either 'dictionary' or 'array', the JSON 
-                 type of each individual dictionary or array entry. 
-
-- **\_properties\_**: if *\_type\_* is 'object', a YAML dictionary of 
-                      fieldName/JSONTypes. 
-                      
-- **JSON schema keywords**: any other JSON schema keywords (wrapped in 
-                            leading and trailing underscore `_` 
-                            characters).
-                            ([See below](#json-schema-keywords)).
-
-### Abbreviations
-
-*If* a JSON type is a simple type, that is neither a dictionary nor an 
-array, which also has no defaults or other JSON schema keywords, *then* 
-the field's value may be abbreviated as the (string) name of a JSON type. 
-
-*If* a JSON type is an array with no defaults or other JSON schema 
-keywords, *then* the field's value may be abbreviated as a YAML dictionary 
-with one key `_array_` whose value is the JSON type of the array's 
-elements. 
-
-*If* a JSON type is a dictionary with no defaults or other JSON schema 
-keywords, *then* the field's value may be abbreviated as a YAML dictionary 
-with one key `_dictionary_` whose value is the JSON type of the 
-dictionary's elements. ***NOTE*** that JSON schema *do not* have 
-"dictionary" types. We automagically map our "dictionaries" to JSON 
-schemas of type "object" whose "additionalProperties" are our dictionary's 
-_items_. (See the StackOverflow [Dictionary-like JSON 
+To help express the overall semantic meaning of the `jsonSchemaDefs` we 
+add a `dictionary` type to the "valid" schema. This `dictionary` type must 
+have an associated `items` key. This `dictionary` type is then transformed 
+into valid JSON schema as suggested by the StackOverflow [Dictionary-like 
+JSON 
 schema](https://stackoverflow.com/questions/27357861/dictionary-like-json-schema) 
-question). 
+question. 
 
 ### JSON schema resources
 
@@ -125,7 +102,8 @@ schema specification which we do not have need to use).
 
 - **preamble keywords**: $id, $schema, $vocabulary,
 
-- **annotation keywords**: description, title
+- **annotation keywords**: description, title, deprecated, readOnly, 
+  writeOnly, examples 
 
 - **assertion keywords**: type, enum, const, multipleOf, maximum, 
   exclusiveMaximum, minimum, exclusiveMinimum, maxLength, minLength, 

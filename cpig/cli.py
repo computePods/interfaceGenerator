@@ -47,7 +47,7 @@ def cli(ctx, configFile, verbose, interface_name):
   print("---------------------------------------------------------")
 
   jsonSchema = cpig.loadInterface.exportJsonSchema(
-    cpig.loadInterface.interfaceDescription['jsonTypes']    
+    cpig.loadInterface.interfaceDescription    
   )
   print("---------------------------------------------------------")
   print(yaml.dump(jsonSchema))
