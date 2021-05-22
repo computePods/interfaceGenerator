@@ -74,21 +74,6 @@ def normalizeJsonSchema(aJsonSchema) :
   for aKey, aValue in aJsonSchema.items() :
     normalizeJsonSchema(aValue)
 
-def exportJsonSchema(interfaceDefinition) :
-  jsonSchema = {}
-  if 'jsonSchemaPreamble' in interfaceDefinition :
-    for aKey, aValue in interfaceDefinition['jsonSchemaPreamble'].items() :
-      jsonSchema[aKey] = copy.deepcopy(aValue)
-
-  theDefs = {}
-  if 'jsonSchemaDefs' in interfaceDefinition :
-    for aKey, aValue in interfaceDefinition['jsonSchemaDefs'].items() :
-      theDefs[aKey] = copy.deepcopy(aValue)
-
-  jsonSchema['$defs'] = theDefs
-
-  return jsonSchema
-
 def normalizeJsonExample(newYamlData) :
   # we have found a jsonExample which we need to deal with
   #
@@ -207,10 +192,10 @@ def addYamlBlock(yamlLines) :
     newYamlData = newYamlData[0]
   elif 'natsChannels' in newYamlData :
     newYamlData = newYamlData[0]
-  elif 'jsonSchemaPreamble' in newYamlData[0] :
+  elif 'jsonSchemaPreambles' in newYamlData[0] :
     newYamlData = newYamlData[0]
   else :
-    print("The YAML block must contain a 'jsonSchemaPreamble', 'jsonSchemaDefs', 'jsonExamples', 'httpRoutes' or 'natsChannel' definition.")
+    print("The YAML block must contain a 'jsonSchemaPreambles', 'jsonSchemaDefs', 'jsonExamples', 'httpRoutes' or 'natsChannel' definition.")
     print("--------------------------------------------------------------")
     print("\n  ".join(yamlLines))
     print("--------------------------------------------------------------")

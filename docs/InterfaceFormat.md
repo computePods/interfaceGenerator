@@ -17,8 +17,10 @@ The outer level of the YAML for an interface consists of a dictionary
 containing five keys: 
 
 1. **`jsonSchemaPreamble`** The (optional) `jsonSchemaPreamble` is a 
-   dictionary of individual JSON schema preable definitions for the whole 
-   schema. 
+   dictionary of the JSON Schemal preambles for each of the root classes 
+   to be built. The keys in the dictionary associated with each root class 
+   consist of the JSON schema preable definitions for that root class's 
+   whole schema. 
 
 2. **`jsonSchemaDefs`** The `jsonSchemaDefs` is a  dictionary of 
    individual JSON types defined using a YAMLized JSON schema format ([see 
