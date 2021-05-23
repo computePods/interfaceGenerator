@@ -12,26 +12,32 @@ import yaml
 
 def loadConfig(configFile, verbose) :
   config = {
-    'pythonOutput' : 'dist/python',
-    'jsOutput'     : 'dist/js',
+    'options' : {
+      'codeTypes' : {
+        'pydantic' : 'python',
+        'ajv'      : 'javaScript',
+      },
+      'codeExts' : {
+        'python'     : '.py',
+        'javaScript' : '.js'
+      },
+      'codeDirs' : {
+        'python'     : 'dist/python',
+        'javaScript' : 'dist/js',
+      }
+    }
   }
   try :
     yamlFile = open(configFile)
     yamlConfig = yaml.safe_load(yamlFile.read())
     yamlFile.close()
-    if type(yamlConfig) is dict :
-      config.update(yamlConfig)
-    elif type(yamlConfig) is list :
-      for aKey in yamlConfig :
-        config[aKey] = True
-    elif type(yamlConfig) is str :
-      config[yamlConfig] = True
+    cpig.loadInterface.mergeYamlData(config, yamlConfig, "")
   except Exception as ex :
     print("Could not load the configuration file: [{}]".format(configFile))
     print(ex)
 
-  config['verbose'] = verbose
-  if 0 < config['verbose'] :
+  config['options']['verbose'] = verbose
+  if 0 < config['options']['verbose'] :
     print("---------------------------------------------------------------")
     print("Configuration:")
     print(yaml.dump(config))
@@ -62,7 +68,7 @@ def cli(ctx, configFile, verbose, interface_name):
     cpig.loadInterface.interfaceDescription    
   )
 
-  cpig.generateCode.ajv(
+  cpig.generateCode.runTemplates(
     config,
     cpig.loadInterface.interfaceDescription    
   )

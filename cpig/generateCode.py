@@ -4,6 +4,8 @@
 
 import copy
 import datamodel_code_generator
+import importlib.resources
+import jinja2
 import json
 import os
 import pathlib
@@ -48,8 +50,9 @@ def pydantic(config, interfaceDefinition) :
     return
 
   for aRootType, aJsonSchema in jsonSchemaGenerator(interfaceDefinition) :
-    outputPath = os.path.join(config['pythonOutput'], aRootType+'.py')
-    os.makedirs(config['pythonOutput'], exist_ok=True)
+    options = config['options']
+    outputPath = os.path.join(options['codeDirs']['python'], aRootType+options['codeExts']['python'])
+    os.makedirs(options['codeDirs']['python'], exist_ok=True)
     print("Generating pydantic {} to {}".format(aRootType, outputPath))
     print("---------------------------------------------------------")
     try: 
@@ -63,16 +66,84 @@ def pydantic(config, interfaceDefinition) :
       print("(It may have been inside a reference to another type)")
 
 
-def ajv(config, interfaceDefinition) :
-  if 'ajv' not in config :
-    return
+def runTemplates(config, interfaceDefinition) :
+  #
+  # setup the collection of generators for our use...
+  #
+  generatorOptions = copy.deepcopy(config)
+  options = generatorOptions['options']
+  del generatorOptions['options']
+  del generatorOptions['pydantic']
 
-  for aRootType, aJsonSchema in jsonSchemaGenerator(interfaceDefinition) :
-    outputPath = os.path.join(config['jsOutput'], aRootType+'.py')
-    os.makedirs(config['jsOutput'], exist_ok=True)
-    print("Generating ajv {} to {}".format(aRootType, outputPath))
-    print("---------------------------------------------------------")
   
+  for generationType, generationDetails in generatorOptions.items() :
+    generationFileName = generationType + '.j2'
+    print(generationType)
+    print(generationFileName)
+    print(yaml.dump(generationDetails))
+
+    jinjaTemplatePath = None
+    if 'jinja2' in generationDetails :
+      jinjaTemplatePath = generationDetails['jinja2']
+      del generationDetails['jinja2']
+
+    theTemplateStr = None
+    if jinjaTemplatePath and os.path.exists(jinjaTemplatePath) :
+      with open(jinjaTemplatePath, 'r') as jinjaFile :
+        theTemplateStr = jinjaFile.read()
+    else :
+      if importlib.resources.is_resource('cpig.templates', generationFileName) :
+        theTemplateStr = importlib.resources.read_text('cpig.templates', generationFileName)
+
+    if jinjaTemplatePath is None :
+      jinjaTemplatePath = 'cpig/'+generationFileName
+
+    if not theTemplateStr :
+      if options['verbose'] :
+        print("No jinja2 template found for {} [{}]".format(generationType, jinjaTemplatePath))
+        continue
+    try : 
+      theTemplate = jinja2.Template(theTemplateStr)
+    except Exception as ex :
+      print("Could not create the Jinja2 template [{}]".format(jinjaTemplatePath))
+      print(ex)
+
+    codeTypes = options['codeTypes']
+    if generationType not in  codeTypes :
+      print("Could not determine the type of code for the {} code generator".format(generationType))
+      continue
+    codeType = codeTypes[generationType]
+    
+    codeDirs = options['codeDirs']
+    if codeType not in codeDirs :
+      print("Could not determine the output directory for the {} code generator".format(generationType))
+      continue
+    outputDir = codeDirs[codeType]
+
+    codeExts = options['codeExts']
+    if codeType not in codeExts :
+      print("Could not determine the output file extension for the {} code generator".format(generationType))
+      continue
+    codeExt = codeExts[codeType]
+
+    for aRootType, aJsonSchema in jsonSchemaGenerator(interfaceDefinition) :
+      outputPath = os.path.join(outputDir, aRootType+codeExt)
+      os.makedirs(outputDir, exist_ok=True)
+      print("Generating {} {} to {}".format(generationType, aRootType, outputPath))
+      print("---------------------------------------------------------")
+    
+      try : 
+        renderedStr = theTemplate.render({
+          'options' : generationDetails,
+          'schema'  : aJsonSchema,
+          'schemaStr' : json.dumps(aJsonSchema, sort_keys=True, indent=2)
+        })
+        with open(outputPath, 'w') as outFile :
+          outFile.write(renderedStr)
+      except Exception as ex :
+        print("Could not render the Jinja2 template [{}] using the {} JSON Schema".format(jinjaTemplatePath, aRootType ))
+        print(ex)
+      
 """
   for aType, aDef in jsonSchema['$defs'].items() :
     newJsonSchema = copy.deepcopy(jsonSchema)

@@ -44,7 +44,7 @@ the interface generator itself).
 If you just want to use the standard defaults they add the following keys: 
 
 ```yaml
-pydantic
+pydantic: True
 ```
 
 ## Producing AJV/JavaScript classes
@@ -55,11 +55,18 @@ server or in the browser) add the following keys:
 
 ```yaml
 ajv:
-  - parse
-  - serialize
+  jinja2: ./templates/ajv.j2
+  parse: True
+  serialize: True
+  options:
+    strict: True
+    allErrors: True
 ```
 
 You can use either or both of the `parse` or `serialize` keywords.
+
+The you can use any of the [AJV options](https://ajv.js.org/options.html) 
+in the `options` dictionary. 
 
 ## Producing JSON examples for use in JavaScript
 
@@ -67,8 +74,10 @@ To produce JSON examples for use in JavaScript add the following keys:
 
 ```yaml
 
-javaScriptExamples
-
+javaScriptExamples: 
+  jinja2: ./templates/jsExamples.j2
+  options:
+    key: value
 ```
 
 ## Producing JSON examples for use in Python
@@ -76,7 +85,10 @@ javaScriptExamples
 To produce JSON examples for use in Python add the following keys:
 
 ```yaml
-pythonExamples
+pythonExamples:
+  jinja2: ./templates/pyExamples.j2
+  options:
+    key: value
 ```
 ## Producing Mock Service Workers for use in JavaScript
 
@@ -84,7 +96,10 @@ To produce Mock Service Workers code from the `httpRoutes` and
 `jsonExamples` then add the following keys:
 
 ```yaml
-mockServiceWorkers
+mockServiceWorkers:
+  jinja2: ./templates/msw.j2
+  options:
+    key: value
 ```
 
 ## Full example with Pydantic defaults

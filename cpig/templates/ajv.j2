@@ -1,0 +1,17 @@
+// This is the ajv validator based upon the {{ schema['title']}} JSON schema 
+
+{{ options }}
+
+schema = {{ schemaStr }}
+
+{% if options['parse'] %}
+
+Parser
+
+{% endif %}
+
+{% if options['serialize'] %}
+
+Serializer
+
+{% endif %}
