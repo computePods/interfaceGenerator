@@ -4,6 +4,7 @@
 
 import copy
 import os
+import re
 import sys
 import yaml
 
@@ -164,6 +165,8 @@ def addYamlBlock(yamlLines) :
 
 sepTranslator = str.maketrans('/\\', '__')
 
+includeInterfaceMatcher = re.compile(r"Include\.Interface\:\s\[.+\]\((.+)\)")
+
 def loadInterfaceFile(interfaceFileName) :
   print("Working on {}".format(interfaceFileName))
 
@@ -185,7 +188,10 @@ def loadInterfaceFile(interfaceFileName) :
         theYaml = []
         insideYaml = False
     else :
-      if line != "```yaml" :
+      includeMatch = includeInterfaceMatcher.search(line)
+      if includeMatch :
+        loadInterfaceFile(includeMatch.group(1))
+      elif line != "```yaml" :
         pass
       else :
         insideYaml = True

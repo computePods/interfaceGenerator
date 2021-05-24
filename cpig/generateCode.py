@@ -58,19 +58,34 @@ def getOutputPaths(options, generationType, generationDetails) :
   
   return [ outputDir, outputPathTemplate ]
 
-def jsonSchemaGenerator(interfaceDefinition) :
+def jsonSchemaGenerator(options, interfaceDefinition) :
+  if 1 < options['verbose'] :
+    print("Generating json schema for {}".format(interfaceDefinition['name']))
 
-  if 'jsonSchemaPreambles' not in interfaceDefinition :
-    return [None, {}]
-  preambles = interfaceDefinition['jsonSchemaPreambles']
+  preambles = { }
+  if 'jsonSchemaPreambles' in interfaceDefinition :
+    preambles = interfaceDefinition['jsonSchemaPreambles']
   
   if 'jsonSchemaDefs' not in interfaceDefinition :
+    if 1 < options['verbose'] :
+      print("NO jsonSchemaDefs found in {}".format(interfaceName))
     return [None, {}]
   defs = interfaceDefinition['jsonSchemaDefs']
+
+  rootTypes = {}
+  if 'httpRoutes' in interfaceDefinition :
+    httpRoutes = interfaceDefinition['httpRoutes']
+    for  aRoute in httpRoutes :
+      if 'response' in aRoute :
+        rootTypes[aRoute['response']] = True
   
-  for aRootType, somePreamble in preambles.items() :
+  for aRootType in rootTypes :
     if aRootType not in defs :
       continue
+
+    somePreamble = {}
+    if aRootType in preambles :
+      somePreamble.update(preambles[aRootType])
       
     jsonSchema = {}
     for aKey, aValue in somePreamble.items() :
@@ -83,15 +98,17 @@ def jsonSchemaGenerator(interfaceDefinition) :
       jsonSchema[aKey] = copy.deepcopy(aValue)
 
     theDefs = {}
-    if 'jsonSchemaDefs' in interfaceDefinition :
-      for aKey, aValue in interfaceDefinition['jsonSchemaDefs'].items() :
-        theDefs[aKey] = copy.deepcopy(aValue)
+    for aKey, aValue in defs.items() :
+      theDefs[aKey] = copy.deepcopy(aValue)
 
     jsonSchema['$defs'] = theDefs
 
+    if 2 < options['verbose'] :
+      print("Yielding {} with schema \n{}".format(aRootType, yaml.dump(jsonSchema)))
     yield [aRootType, jsonSchema]
 
 def pydantic(config, interfaceDefinition) :
+  options = config['options']
   if 'genSchema' not in config :
     return
   if 'pydantic' not in config['genSchema'] :
@@ -102,7 +119,7 @@ def pydantic(config, interfaceDefinition) :
   if outputDir is None :
     return
 
-  for aRootType, aJsonSchema in jsonSchemaGenerator(interfaceDefinition) :
+  for aRootType, aJsonSchema in jsonSchemaGenerator(options, interfaceDefinition) :
     outputPath = outputPathTemplate.format(aRootType)
     os.makedirs(outputDir, exist_ok=True)
     print("Generating pydantic {} to {}".format(aRootType, outputPath))
@@ -119,6 +136,8 @@ def pydantic(config, interfaceDefinition) :
 
 def runSchemaTemplates(config, interfaceDefinition) :
   interfaceName = interfaceDefinition['name']
+  if 1 < config['options']['verbose'] :
+    print("Running schema templates on {}".format(interfaceName))
   #
   # setup the collection of generators for our use...
   #
@@ -128,6 +147,8 @@ def runSchemaTemplates(config, interfaceDefinition) :
   del generatorOptions['pydantic']
   
   for generationType, generationDetails in generatorOptions.items() :
+    if 1 < config['options']['verbose'] :
+      print("Running {} schema templates on {}".format(generationType, interfaceName))
 
     theTemplate, jinjaTemplatePath = loadTemplate(
       options, generationType, generationDetails)
@@ -139,7 +160,7 @@ def runSchemaTemplates(config, interfaceDefinition) :
     if outputDir is None :
       continue
       
-    for aRootType, aJsonSchema in jsonSchemaGenerator(interfaceDefinition) :
+    for aRootType, aJsonSchema in jsonSchemaGenerator(options, interfaceDefinition) :
       outputPath = outputPathTemplate.format(aRootType)
       os.makedirs(outputDir, exist_ok=True)
       print("Generating {} {} to {}".format(generationType, aRootType, outputPath))
