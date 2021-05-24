@@ -1,0 +1,21 @@
+// This is the collection of {{ options['interfaceName'] }} mock service workers
+
+import { rest } from 'msw'
+
+export const {{options['interfaceName']}}_handlers = [
+{% for exampleType in examples %}
+  // {{ exampleType }} handlers
+  {% for anExample in examples[exampleType] %}{%   if anExample['httpRoutes'] %}
+    // {{ anExample['title'] }}
+    rest.{{anExample['httpRoutes']['action'] | lower }}('{{anExample['httpRoutes']['route']}}', (req, res, ctx) => {
+    	
+      return res(
+      	ctx.status(200),
+      	ctx.json({{ anExample['example'] | tojson(2) | indent("        ")}}),
+      )
+
+    }),
+  {%   endif %}{% endfor %}
+{% endfor %}
+]
+

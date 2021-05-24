@@ -3,56 +3,9 @@
 #   https://github.com/jreese/markdown-pp
 
 import copy
+import os
 import sys
 import yaml
-
-jsonSchemaKeywords = {
-  # See: http://json-schema.org/draft/2020-12/json-schema-core.html#vocabulary
-  # see: http://json-schema.org/draft/2020-12/json-schema-core.html#id-keyword
-  # preamble keywords:
-  "$id" : True,  
-  "$schema" : True, 
-  "$vocabulary" : True,
-
-  # See: http://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.7.7
-  # See: http://json-schema.org/draft/2020-12/json-schema-validation.html#rfc.section.9
-  # annotation keywords:
-  "title" : True,
-  "description" : True,
-  "deprecated": True,
-  "readOnly": True,
-  "writeOnly": True,
-  "examples": True,
-
-  # See: http://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.7.6
-  # See: http://json-schema.org/draft/2020-12/json-schema-validation.html#rfc.section.6
-  # assertion keywords:
-  "type" : True,
-  "enum" : True,
-  "const" : True,
-  "multipleOf" : True,
-  "maximum" : True, 
-  "exclusiveMaximum" : True,
-  "minimum" : True,
-  "exclusiveMinimum" : True,
-  "maxLength" : True,
-  "minLength" : True, 
-  "pattern" : True,
-  "maxItems" : True,
-  "minItems" : True,
-  "uniqueItems" : True,
-  "maxContains" : True,
-  "minContains" : True, 
-  "maxProperties" : True,
-  "minProperties" : True,
-  "required" : True,
-  "dependentRequired" : True, 
-
-  # See: http://json-schema.org/draft/2020-12/json-schema-core.html#rfc.section.7.5
-  # See: http://json-schema.org/draft/2020-12/json-schema-validation.html#rfc.appendix.A
-  #applicator keywords:
-  "$ref" : True,
-}
 
 def normalizeJsonSchema(aJsonSchema) :
   #
@@ -209,8 +162,14 @@ def addYamlBlock(yamlLines) :
   #
   mergeYamlData(interfaceDescription, newYamlData, "")
 
+sepTranslator = str.maketrans('/\\', '__')
+
 def loadInterfaceFile(interfaceFileName) :
   print("Working on {}".format(interfaceFileName))
+
+  baseName, extension = os.path.splitext(interfaceFileName)
+  interfaceDescription['name'] = baseName.translate(sepTranslator)
+  
   interface = open(interfaceFileName)
   lines = interface.readlines()
   interface.close()

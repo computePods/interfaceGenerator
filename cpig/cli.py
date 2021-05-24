@@ -13,18 +13,14 @@ import yaml
 def loadConfig(configFile, verbose) :
   config = {
     'options' : {
-      'codeTypes' : {
-        'pydantic' : 'python',
-        'ajv'      : 'javaScript',
+      'distDir' : 'dist',
+      'outputPathTemplates' : {
+        'pydantic'           : [ 'python', '{}.py' ],
+        'ajv'                : [ 'js',     '{}_ajv.js' ],
+        'pythonExamples'     : [ 'python', '{}Examples.py' ],
+        'javaScriptExamples' : [ 'js',     '{}Examples.js' ],
+        'mockServiceWorkers' : [ 'js',     '{}Msw.js' ],
       },
-      'codeExts' : {
-        'python'     : '.py',
-        'javaScript' : '.js'
-      },
-      'codeDirs' : {
-        'python'     : 'dist/python',
-        'javaScript' : 'dist/js',
-      }
     }
   }
   try :
@@ -68,7 +64,12 @@ def cli(ctx, configFile, verbose, interface_name):
     cpig.loadInterface.interfaceDescription    
   )
 
-  cpig.generateCode.runTemplates(
+  cpig.generateCode.runSchemaTemplates(
+    config,
+    cpig.loadInterface.interfaceDescription    
+  )
+
+  cpig.generateCode.runExampleTemplates(
     config,
     cpig.loadInterface.interfaceDescription    
   )

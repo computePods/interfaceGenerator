@@ -1,0 +1,10 @@
+// This is the collection of {{ options['interfaceName'] }} examples
+
+const {{ options['interfaceName'] }}_Examples = {
+{% for exampleType in examples %}
+  "{{ exampleType }}" : { {% for anExample in examples[exampleType] %}
+    "{{ anExample['name'] }}"' : {{ anExample['example'] | tojson(2) | indent("    ")}},
+  {% endfor %} },
+{% endfor %}
+}
+
