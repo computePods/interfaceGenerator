@@ -23,4 +23,6 @@ At the moment the interface generator generates the follow types of code:
 - JSON example data in JavaScript format
 
 - HTTP routes mocked in JavaScript using [Mock Service 
-  Workers](https://mswjs.io/docs/) 
+  Workers](https://mswjs.io/docs/)
+
+- HTTP mount points expressed as Mithril mixin components.

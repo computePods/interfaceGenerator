@@ -11,14 +11,16 @@ or `--config` command line option to specify a different configuration
 file. 
 
 This configuration file works by having or not having one or more 
-hierarchies of values. 
+hierarchies of values located as sub-hierarchies of one of the top-level 
+keys: `genSchema`, `genExamples`, `genHttpRoutes`, `options`.
 
 ## Controlling where the output code files go
 
 To specify the directory in which to place output code add the following key:
 
 ```yaml
-output: <aPath>
+options:
+  output: <aPath>
 ```
 
 where `<aPath` is either an absolute path in your file system, or a path 
@@ -30,8 +32,9 @@ To produce [Pydantic](https://pydantic-docs.helpmanual.io/) data classes
 for use in Python code add the following keys: 
 
 ```yaml
-pydantic:
-  <aCollectionOfKey>: <valuePairs>
+genSchema:
+  pydantic:
+    <aCollectionOfKey>: <valuePairs>
 ```
 
 You can use any of the 
@@ -44,7 +47,8 @@ the interface generator itself).
 If you just want to use the standard defaults they add the following keys: 
 
 ```yaml
-pydantic: True
+genSchema:
+  pydantic: {}
 ```
 
 ## Producing AJV/JavaScript classes
@@ -54,13 +58,12 @@ validation / serialisation code for use in JavaScript (either on the
 server or in the browser) add the following keys: 
 
 ```yaml
-ajv:
-  jinja2: ./templates/ajv.j2
-  parse: True
-  serialize: True
-  options:
-    strict: True
-    allErrors: True
+genSchema:
+  ajv:
+    jinja2: ./templates/ajv.j2
+    ajvOptions:
+      strict: True
+      allErrors: True
 ```
 
 You can use either or both of the `parse` or `serialize` keywords.
@@ -73,11 +76,11 @@ in the `options` dictionary.
 To produce JSON examples for use in JavaScript add the following keys:
 
 ```yaml
-
-javaScriptExamples: 
-  jinja2: ./templates/jsExamples.j2
-  options:
-    key: value
+genExamples:
+  javaScriptExamples: 
+    jinja2: ./templates/jsExamples.j2
+    options:
+      key: value
 ```
 
 ## Producing JSON examples for use in Python
@@ -85,21 +88,37 @@ javaScriptExamples:
 To produce JSON examples for use in Python add the following keys:
 
 ```yaml
-pythonExamples:
-  jinja2: ./templates/pyExamples.j2
-  options:
-    key: value
+genExamples:
+  pythonExamples:
+    jinja2: ./templates/pyExamples.j2
+    options:
+      key: value
 ```
+
 ## Producing Mock Service Workers for use in JavaScript
 
 To produce Mock Service Workers code from the `httpRoutes` and 
 `jsonExamples` then add the following keys:
 
 ```yaml
-mockServiceWorkers:
-  jinja2: ./templates/msw.j2
-  options:
-    key: value
+genExamples:
+  mockServiceWorkers:
+    jinja2: ./templates/msw.j2
+    options:
+      key: value
+```
+
+## Producing Mithril connector mixin components for use in JavaScript
+
+To produce Mithril connector mixin components code from the `httpRoutes` 
+then add the following keys: 
+
+```yaml
+genHttpRoutes:
+  mithrilConnectors:
+    jinja2: ./templates/mithrilConnectors.j2
+    options:
+      key: value
 ```
 
 ## Full example with Pydantic defaults
@@ -108,15 +127,21 @@ To produce all of the output using the Pydantic defaults use the following
 configuration file: 
 
 ```yaml
-pydantic
+options:
+  output: aPath
+  
+genSchema:
+  pydantic: {}
+  ajv:
+    ajvOptions:
+      strict: True
+      allErrors: True
 
-ajv:
-  - parse
-  - serialize
+genExamples:
+  javaScriptExamples: {}
+  pythonExamples: {}
+  mockServiceWorkers: {}
 
-javaScriptExamples
-
-pythonExamples
-
-mockServiceWorkers
+genHttpRoutes:
+  mithrilConnectors: {}
 ```

@@ -22,19 +22,69 @@ containing five keys:
    consist of the JSON schema preamble definitions for that root class's 
    whole schema. 
 
+   The YAMLized schema for `jsonSchemaPreamble` is as follows:
+
+   ```yaml
+     jsonSchemaPreamble:
+       # is a dictionary of jsonType -> JSON Schema preamble strings
+       type: dictionary
+       items:
+         type: dictionary
+         items:
+           type: string
+   ```
+
 2. **`jsonSchemaDefs`** The `jsonSchemaDefs` is a  dictionary of 
    individual JSON types defined using a YAMLized JSON schema format ([see 
    below](#yamlized-json-schema-format)) 
+
+   The YAMLized schema for `jsonSchemaDefs` is as follows:
+   
+   ```yaml
+     jsonSchemaDefs:
+       # is a dictionary of jsonType -> JSON Schema definitions
+       type: dictionary
+       items: 
+         type: draft7  # A (draft 7) JSON Schema
+   ```
 
 3. **`jsonExamples`** The `jsonExamples` is a  dictionary containing 
    arrays of JSON examples for each major JSON type. These examples can be 
    used in automated testing of the interfaced components. 
 
-4. **`httpRoutes`** The `httpRoutes` is a  dictionary of individual HTTP 
-   routes. Each route object is a dictionary of HTTP actions (GET/PUT). 
-   Each HTTP action is a dictionary describing the route/action and the 
-   type of its expected JSON payload and response (if any). Each JSON type 
-   MUST be described in the `jsonSchemaDefs` dictionary. 
+   The YAMLized schema for the *header* of one `jsonExamples` is as 
+   follows: 
+   
+   ```yaml
+     jsonExamplesHeader:
+       # is a dictionary of jsonType -> http route fragments
+       type: object
+       properties:
+         title:
+           type: string
+         httpRoutes:
+           type: object
+           properties:
+             # an httpRoute fragment is a object of:
+             #  - an example route (url)
+             #  - an action
+             route:
+               type: string
+             action:
+               enum:
+                - GET
+                - POST
+                - PUT
+                - DELETE
+    ```
+ 
+4. **`httpRoutes`** The `httpRoutes` is a dictionary of server HTTP mount 
+   points. Associated with each mount point is a JSON object with the 
+   properties `body` (which is the *name* of a `jsonType` in the 
+   `jsonSchemaDefs`), `url` (a string URL template for the mount point), 
+   `actions` (an array of `GET`, `POST`, `PUT` and `DELETE` HTTP actions). 
+   The `body` `jsonType` is expected JSON payload and response (if any). 
+   Each JSON type MUST be described in the `jsonSchemaDefs` dictionary. 
 
    **Question**: Since the HTTP route orders tend to be significant, 
    should this be an ordered array (or can we simply order the keys)?
@@ -43,11 +93,52 @@ containing five keys:
    but each route will have a numeric "priority" field. The collection of 
    routes will be sorted by priority and then the route (as a string). 
 
+   The YAMLized schema for `httpRoutes` is as follows:
+   
+    ```yaml 
+     httpRoutes:
+       # is a dictionary of mountPoints -> httpRoutes 
+       type: dictionary
+       items:
+         # an httpRoute is a dictionary of:
+         #  - a list of actions (GET, POST, PUT, DELETE)
+         #  - a declaration of the request/response body format 
+         #    as a jsonType in the jsonSchemaDefs
+         #  - the url template (which may include <name> elements)
+         #
+         # We follow a RESTful interface guide lines:
+         # See: https://en.wikipedia.org/wiki/Representational_state_transfer#Semantics_of_HTTP_methods
+         #
+         type: object
+         properties:
+           body:
+             # the name of a jsonType in the jsonSchemaDefs
+             type: string 
+           url:
+             # the url template for this mount point
+             type: string 
+           actions:
+             type: array
+             items:
+               enum:
+                 - GET
+                 - POST
+                 - PUT
+                 - DELETE
+   ```
+
 5. **`natsChannels`** The `natsChannels` is a dictionary of NATS channels. 
    Each channel is a dictionary describing the channel and the type of its 
    expected JSON payloads and responses (if any). Each JSON type MUST be 
    described in the `jsonSchemaDefs` dictionary. 
 
+   The YAMLized schema for `natsChannels` is as follows:
+   
+   ```yaml
+     natsChannels: { }
+       # is a dictionary of NATS channels -> ????
+   ```
+   
 The parsing and validation of the JSON payloads will be done using 
 [AJV](https://ajv.js.org/) (for JavaScript) and 
 [datamodel-code-generator](https://github.com/koxudaxi/datamodel-code-generator) +
