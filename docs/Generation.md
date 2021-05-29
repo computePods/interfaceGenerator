@@ -17,7 +17,7 @@ At the moment the interface generator generates the follow types of code:
 
 - JSON example data in Python format
 
-- JSON type definition in JavaScript formated using 
+- JSON type definition in JavaScript formatted using 
   [AJV](https://ajv.js.org/) 
 
 - JSON example data in JavaScript format

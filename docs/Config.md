@@ -5,7 +5,7 @@
 The ComputePods interface generator is primarily configured using a 
 [YAML](https://en.wikipedia.org/wiki/YAML) configuration file. 
 
-By default this configuraiton file is called `cpigConfig.yaml` in the 
+By default this configuration file is called `cpigConfig.yaml` in the 
 directory in which the tool is started. Alternatively you can use the `-c` 
 or `--config` command line option to specify a different configuration 
 file. 
@@ -36,9 +36,9 @@ pydantic:
 
 You can use any of the 
 [datamodel-code-generator](https://github.com/koxudaxi/datamodel-code-generator#usage) 
-command line options in the above collectino of key/value pairs. If the 
+command line options in the above collection of key/value pairs. If the 
 option takes no arguments, then simply leave the value empty. (Note that 
-any of the "input" options will be ignored as the input is controled by 
+any of the "input" options will be ignored as the input is controlled by 
 the interface generator itself). 
 
 If you just want to use the standard defaults they add the following keys: 
@@ -50,7 +50,7 @@ pydantic: True
 ## Producing AJV/JavaScript classes
 
 To produce [AJV](https://ajv.js.org/guide/getting-started.html) parsing / 
-validation / serialization code for use in JavaScript (either on the 
+validation / serialisation code for use in JavaScript (either on the 
 server or in the browser) add the following keys: 
 
 ```yaml

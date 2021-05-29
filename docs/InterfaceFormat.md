@@ -17,9 +17,9 @@ The outer level of the YAML for an interface consists of a dictionary
 containing five keys: 
 
 1. **`jsonSchemaPreamble`** The (optional) `jsonSchemaPreamble` is a 
-   dictionary of the JSON Schemal preambles for each of the root classes 
+   dictionary of the JSON Schema preambles for each of the root classes 
    to be built. The keys in the dictionary associated with each root class 
-   consist of the JSON schema preable definitions for that root class's 
+   consist of the JSON schema preamble definitions for that root class's 
    whole schema. 
 
 2. **`jsonSchemaDefs`** The `jsonSchemaDefs` is a  dictionary of 
@@ -36,7 +36,7 @@ containing five keys:
    type of its expected JSON payload and response (if any). Each JSON type 
    MUST be described in the `jsonSchemaDefs` dictionary. 
 
-   **Question**: Since the http route orders tend to be significant, 
+   **Question**: Since the HTTP route orders tend to be significant, 
    should this be an ordered array (or can we simply order the keys)?
    
    **Answer**: We will use a  dictionary for the collection of routes, 
@@ -55,7 +55,7 @@ The parsing and validation of the JSON payloads will be done using
 
 ## YAMLized JSON schema format
 
-The YAMLized description of each JSON type is essentially that fragement 
+The YAMLized description of each JSON type is essentially that fragment 
 of the full [JSON schema](http://json-schema.org/) which is needed to 
 define *one* JSON type. Once processed by the interface generator, the 
 combination of the `jsonSchemaPreamble` and the `jsonSchemaDefs` is a JSON 
@@ -99,7 +99,7 @@ specifications.
 ### JSON schema keywords
 
 The following is a list of the JSON schema keywords which the interface 
-generator tool recognizes (there may be other keywords defined by the JSON 
+generator tool recognises (there may be other keywords defined by the JSON 
 schema specification which we do not have need to use).
 
 - **preamble keywords**: $id, $schema, $vocabulary,
@@ -114,4 +114,4 @@ schema specification which we do not have need to use).
 
 - **applicator keywords**: $ref
 
-Note that this list and categoraization is *not* definitive.
+Note that this list and categorisation is *not* definitive.

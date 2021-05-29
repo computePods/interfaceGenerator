@@ -20,6 +20,7 @@ def loadConfig(configFile, verbose) :
         'pythonExamples'     : [ 'python', '{}Examples.py' ],
         'javaScriptExamples' : [ 'js',     '{}Examples.js' ],
         'mockServiceWorkers' : [ 'js',     '{}Msw.js' ],
+        'mithrilConnectors'  : [ 'js',     '{}MithrilConnectors.js']
       },
     }
   }
@@ -70,6 +71,11 @@ def cli(ctx, configFile, verbose, interface_name):
   )
 
   cpig.generateCode.runExampleTemplates(
+    config,
+    cpig.loadInterface.interfaceDescription    
+  )
+
+  cpig.generateCode.runHttpRouteTemplates(
     config,
     cpig.loadInterface.interfaceDescription    
   )

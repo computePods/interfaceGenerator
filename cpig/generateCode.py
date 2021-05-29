@@ -28,14 +28,15 @@ def loadTemplate(options, generationType, generationDetails) :
       jinjaTemplatePath = 'cpig/'+generationFileName
 
   if not theTemplateStr :
-    if options['verbose'] :
-      print("No jinja2 template found for {} [{}]".format(generationType, jinjaTemplatePath))
-      return [ None, jinjaTemplatePath ]
+    print("No jinja2 template found for {} [{}]".format(generationType, jinjaTemplatePath))
+    return [ None, jinjaTemplatePath ]
+
   try : 
     theTemplate = jinja2.Template(theTemplateStr)
   except Exception as ex :
     print("Could not create the Jinja2 template [{}]".format(jinjaTemplatePath))
     print(ex)
+    return [ None, jinjaTemplatePath ]
 
   return [ theTemplate, jinjaTemplatePath ]
 
@@ -46,7 +47,7 @@ def getOutputPaths(options, generationType, generationDetails) :
     outputPathTemplates = options['outputPathTemplates']
     if generationType not in outputPathTemplates :
       print("Could not determine the output path template for the {} code generator".format(generationType))
-      return None
+      return [ None, None ]
     else:
       outputPathTemplate = outputPathTemplates[generationType]
   else:
@@ -75,10 +76,14 @@ def jsonSchemaGenerator(options, interfaceDefinition) :
   rootTypes = {}
   if 'httpRoutes' in interfaceDefinition :
     httpRoutes = interfaceDefinition['httpRoutes']
-    for  aRoute in httpRoutes :
+    for  aRouteKey, aRoute in httpRoutes.items() :
       if 'response' in aRoute :
         rootTypes[aRoute['response']] = True
-  
+
+  if 2 < options['verbose'] :
+    print("rootTypes:")
+    print(yaml.dump(rootTypes))
+    
   for aRootType in rootTypes :
     if aRootType not in defs :
       continue
@@ -108,11 +113,16 @@ def jsonSchemaGenerator(options, interfaceDefinition) :
     yield [aRootType, jsonSchema]
 
 def pydantic(config, interfaceDefinition) :
+  interfaceName = interfaceDefinition['name']
   options = config['options']
   if 'genSchema' not in config :
     return
+
   if 'pydantic' not in config['genSchema'] :
     return
+
+  if 1 < options['verbose'] :
+    print("Running pydantic schema templates on {}".format(interfaceName))
 
   outputDir, outputPathTemplate = getOutputPaths(
     config['options'], 'pydantic', config['genSchema']['pydantic'])
@@ -133,6 +143,9 @@ def pydantic(config, interfaceDefinition) :
       print("Error found while parsing the [{}] JSON type".format(aRootType))
       print("  "+"\n    ".join(str(ex).split("\n")))
       print("(It may have been inside a reference to another type)")
+      print("---------------------------------------------------------------")
+      print(yaml.dump(aJsonSchema))
+      print("---------------------------------------------------------------")
 
 def runSchemaTemplates(config, interfaceDefinition) :
   interfaceName = interfaceDefinition['name']
@@ -143,6 +156,8 @@ def runSchemaTemplates(config, interfaceDefinition) :
   #
   generatorOptions = copy.deepcopy(config)
   options = generatorOptions['options']
+  if 'genSchema' not in generatorOptions :
+    return
   generatorOptions = generatorOptions['genSchema']
   del generatorOptions['pydantic']
   
@@ -187,13 +202,15 @@ def runExampleTemplates(config, interfaceDefinition) :
   
   if 'jsonExamples' not in interfaceDefinition :
     return
-    
+
   jsonExamples = interfaceDefinition['jsonExamples']
   #
   # setup the collection of generators for our use...
   #
   generatorOptions = copy.deepcopy(config)
   options = generatorOptions['options']
+  if 'genExamples' not in generatorOptions :
+    return
   generatorOptions = generatorOptions['genExamples']
 
   for generationType, generationDetails in generatorOptions.items() :
@@ -230,4 +247,47 @@ def runExampleTemplates(config, interfaceDefinition) :
         outFile.write(renderedStr)
     except Exception as ex :
       print("Could not render the Jinja2 template [{}] using the {} jsonExamples".format(jinjaTemplatePath, interfaceName ))
+      print(ex)
+
+def runHttpRouteTemplates(config, interfaceDefinition) :
+  interfaceName = interfaceDefinition['name']
+  
+  if 'httpRoutes' not in interfaceDefinition :
+    return
+    
+  httpRoutes = interfaceDefinition['httpRoutes']
+  #
+  # setup the collection of generators for our use...
+  #
+  generatorOptions = copy.deepcopy(config)
+  options = generatorOptions['options']
+  if 'genHttpRoutes' not in generatorOptions :
+    return
+  generatorOptions = generatorOptions['genHttpRoutes']
+
+  for generationType, generationDetails in generatorOptions.items() :
+
+    theTemplate, jinjaTemplatePath = loadTemplate(
+      options, generationType, generationDetails)
+    
+    outputDir, outputPathTemplate = getOutputPaths(
+      options, generationType, generationDetails)
+    if outputDir is None :
+      continue
+
+    outputPath = outputPathTemplate.format(interfaceName)
+    os.makedirs(outputDir, exist_ok=True)
+    print("Generating {} {} to {}".format(generationType, interfaceName, outputPath))
+    print("---------------------------------------------------------")
+
+    generationDetails['interfaceName'] = interfaceName
+    try : 
+      renderedStr = theTemplate.render({
+        'options'    : generationDetails,
+        'httpRoutes' : httpRoutes,
+      })
+      with open(outputPath, 'w') as outFile :
+        outFile.write(renderedStr)
+    except Exception as ex :
+      print("Could not render the Jinja2 template [{}] using the {} httpRoutes".format(jinjaTemplatePath, interfaceName ))
       print(ex)

@@ -9,10 +9,10 @@ well as [NATS (publish/subscribe and
 request/response)](https://docs.nats.io/) interfaces. All of these
 interfaces will use [JSON payloads](https://en.wikipedia.org/wiki/JSON).
 
-It uses a [Litterate definition 
+It uses a [Literate definition 
 style](https://en.wikipedia.org/wiki/Literate_programming) based upon a 
 mixture of [Markdown](https://en.wikipedia.org/wiki/Markdown) and 
-[YAML](https://en.wikipedia.org/wiki/YAML) formated files. 
+[YAML](https://en.wikipedia.org/wiki/YAML) formatted files. 
 
 [The design of the interface format can be found here.](InterfaceFormat.md)
 

@@ -1,0 +1,28 @@
+// This is a collection of Mithril connectors mixins for the
+// {{ options['interfaceName'] }} interface.
+
+// The function associated with each prefix is a "factory" which returns a 
+// mixin object to be mixed-in to the ultimate Mithril Component.
+
+// Each of the mixin objects contains a getDataFromServer method which 
+// "remembers" the URL which was originally passed to the "factory" method 
+// when it create the mixin. 
+
+export const connectorMixins = {
+{% for aMountPoint in httpRoutes %}
+{%   for anAction in httpRoutes[aMountPoint].actions %}
+  "{{ aMountPoint }}": function( entityUrl ) {
+    "{{ anAction | lower }}ServerData": function() {
+      m.request({
+        method: "{{ anAction }}",
+        url: entityUrl,
+        {% if anAction == "PUT" %}body: requestBody,{% endif %}
+      }).then(function(result) {
+        console.dir(result, {depth: null, colors: true});
+        this.data = result
+      })
+    }
+  },
+{%   endfor %}
+{% endfor %}
+}

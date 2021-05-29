@@ -3,15 +3,127 @@
 #   https://github.com/jreese/markdown-pp
 
 import copy
+import json
+import jsonschema
 import os
 import re
 import sys
 import yaml
 
+# We validate the following schema using: jsonschema.Draft7Validator
+# see: https://stackoverflow.com/a/13826826
+# 
+interfaceSchemasYaml = """
+  jsonSchemaPreamble:
+    # is a dictionary of jsonType -> JSON Schema preamble strings
+    type: dictionary
+    items:
+      type: dictionary
+      items:
+        type: string
+      
+  jsonSchemaDefs:
+    # is a dictionary of jsonType -> JSON Schema definitions
+    type: dictionary
+    items: 
+      type: draft7  # A (draft 7) JSON Schema
+
+  jsonExamplesHeader:
+    # is a dictionary of jsonType -> http route fragments
+    type: object
+    properties:
+      title:
+        type: string
+      httpRoutes:
+        type: object
+        properties:
+          # an httpRoute fragment is a object of:
+          #  - an example route (url)
+          #  - an action
+          route:
+            type: string
+          action:
+            enum:
+             - GET
+             - POST
+             - PUT
+             - DELETE
+  
+  httpRoutes:
+    # is a dictionary of mountPoints -> httpRoutes 
+    type: dictionary
+    items:
+      # an httpRoute is a dictionary of:
+      #  - a list of actions (GET, POST, PUT, DELETE)
+      #  - a declaration of the request/response body format 
+      #    as a jsonType in the jsonSchemaDefs
+      #  - the url template (which may include <name> elements)
+      #
+      # We follow a RESTful interface guide lines:
+      # See: https://en.wikipedia.org/wiki/Representational_state_transfer#Semantics_of_HTTP_methods
+      #
+      type: object
+      properties:
+        body:
+          # the name of a jsonType in the jsonSchemaDefs
+          type: string 
+        url:
+          # the url template for this mount point
+          type: string 
+        actions:
+          type: array
+          items:
+            enum:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+
+  natsChannels: { }
+    # is a dictionary of NATS channels -> ????
+"""
+
+def validateJsonData(jsonData, aSchemaName) :
+  if aSchemaName not in interfaceSchemas :
+    print("Interface schema name {} has not been defined".format(aSchemaName))
+    print(yaml.dump(jsonData))
+    return
+    
+  if aSchemaName == 'jsonSchemaDefs' :
+    validateSchema(aSchemaName, jsonData)
+    return
+
+  aSchema = interfaceSchemas[aSchemaName]
+  try :
+    jsonschema.validate(
+      instance=jsonData,
+      schema=aSchema,
+    )
+  except Exception as ex :
+    print("Could not validate the schema {}".format(aSchemaName))
+    print("--------------------------------------------------------")
+    print(yaml.dump(jsonData))
+    print("--------------------------------------------------------")
+    print(yaml.dump(aSchema))
+    print("--------------------------------------------------------")
+    print(ex)
+    sys.exit(-1)
+
+def validateSchema(aSchemaName, aSchema) :
+  try :
+    jsonschema.Draft7Validator.check_schema(aSchema)
+  except Exception as ex :
+    print("Could not validate the schema {}".format(aSchemaName))
+    print("--------------------------------------------------------")
+    print(yaml.dump(aSchema))
+    print("--------------------------------------------------------")
+    print(ex)
+    sys.exit(-1)
+
 def normalizeJsonSchema(aJsonSchema) :
   #
   # We translate our version of 'dictionaries' to the official JSON schema 
-  # versino as suggested by:
+  # version as suggested by:
   #
   # https://stackoverflow.com/questions/27357861/dictionary-like-json-schema
   #
@@ -28,13 +140,25 @@ def normalizeJsonSchema(aJsonSchema) :
   for aKey, aValue in aJsonSchema.items() :
     normalizeJsonSchema(aValue)
 
+def loadInterfaceSchemas() :
+  global interfaceSchemas
+  if interfaceSchemas is None :
+    interfaceSchemas = yaml.safe_load(interfaceSchemasYaml)
+    normalizeJsonSchema(interfaceSchemas)
+    for aSchemaName, aSchema in interfaceSchemas.items() :
+      if aSchemaName != 'jsonSchemaDefs' :
+        validateSchema(aSchemaName, aSchema)
+
+interfaceSchemas = None
+loadInterfaceSchemas()
+
 def normalizeJsonExample(newYamlData) :
   # we have found a jsonExample which we need to deal with
   #
   # jsonExamples consist of two YAML documents...
-  #   the first document describes the example
-  #     which jsonType it corresponds to
-  #     and an interface it will be used with
+  #   the first document describes the example:
+  #     - which jsonType it corresponds to
+  #     - and an interface it will be used with
   #   the second document is the message itself
   if len(newYamlData) < 2 :
     print("jsonExamples MUST consist of TWO YAML documents... only one found")
@@ -83,6 +207,9 @@ def normalizeJsonExample(newYamlData) :
   return None
 
 def mergeYamlData(yamlData, newYamlData, thePath) :
+  # This is a generic Python merge
+  # It is a *deep* merge and handles both dictionaries and arrays
+  #
   if type(yamlData) is None :
     print("ERROR yamlData should NEVER be None ")
     sys.exit(-1)
@@ -140,14 +267,19 @@ def addYamlBlock(yamlLines) :
   if 'jsonSchemaDefs' in newYamlData[0] :
     newYamlData = newYamlData[0]
     normalizeJsonSchema(newYamlData)
+    validateJsonData(newYamlData, 'jsonSchemaDefs')
   elif 'jsonExamples' in newYamlData[0] :
+    validateJsonData(newYamlData[0], 'jsonExamplesHeader')
     newYamlData = normalizeJsonExample(newYamlData)
   elif 'httpRoutes' in newYamlData[0] :
     newYamlData = newYamlData[0]
+    validateJsonData(newYamlData, 'httpRoutes')
   elif 'natsChannels' in newYamlData :
     newYamlData = newYamlData[0]
+    validateJsonData(newYamlData, 'natsChannels')
   elif 'jsonSchemaPreambles' in newYamlData[0] :
     newYamlData = newYamlData[0]
+    validateJsonData(newYamlData, 'jsonSchemaPreambles')
   else :
     print("The YAML block must contain a 'jsonSchemaPreambles', 'jsonSchemaDefs', 'jsonExamples', 'httpRoutes' or 'natsChannel' definition.")
     print("--------------------------------------------------------------")
@@ -170,8 +302,10 @@ includeInterfaceMatcher = re.compile(r"Include\.Interface\:\s\[.+\]\((.+)\)")
 def loadInterfaceFile(interfaceFileName) :
   print("Working on {}".format(interfaceFileName))
 
-  baseName, extension = os.path.splitext(interfaceFileName)
-  interfaceDescription['name'] = baseName.translate(sepTranslator)
+  if 'name' not in interfaceDescription :
+    # the name of the first interface file loaded... wins...
+    baseName, extension = os.path.splitext(interfaceFileName)
+    interfaceDescription['name'] = baseName.translate(sepTranslator)
   
   interface = open(interfaceFileName)
   lines = interface.readlines()
