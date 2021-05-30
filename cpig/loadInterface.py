@@ -287,7 +287,6 @@ def addYamlBlock(yamlLines) :
     print("--------------------------------------------------------------")
     return
 
-
   # Check and merge the normalized YAML data
   #
   if newYamlData is None :
@@ -295,18 +294,95 @@ def addYamlBlock(yamlLines) :
   #
   mergeYamlData(interfaceDescription, newYamlData, "")
 
-sepTranslator = str.maketrans('/\\', '__')
 
+def checkEntityInterfaceMapping() :
+  # The over all interface MUST have an entityInterfaceMapping
+  #
+  # AND all of the mount points MUST have been defined
+  #
+  # AND all of the entityTypes MUST have been deinfed in the entityType 
+  #     definition 
+  
+  if 'jsonExamples' not in interfaceDescription :
+    print("Error no entityInterfaceMapping found (no jsonExamples)")
+    print(yaml.dump(interfaceDescription))
+    sys.exit(-1)
+  jsonExamples = interfaceDescription['jsonExamples']
+
+  if 'entityInterfaceMapping' not in jsonExamples :
+    print("Error no entityInterfaceMapping found")
+    print(yaml.dump(jsonExamples))
+    sys.exit(-1)
+  entityInterfaceMapping = jsonExamples['entityInterfaceMapping'][0]
+
+  if 'example' not in entityInterfaceMapping :
+    print("Error no entityInterfaceMapping found (no details)")
+    print(yaml.dump(entityInterfaceMapping))
+    sys.exit(-1)
+
+  if 'httpRoutes' not in interfaceDescription :
+    print("Error no httpRoutes defined for entityInterfaceMapping")
+    print(yaml.dump(interfaceDescription))
+    sys.exit(-1)
+  httpRoutes = interfaceDescription['httpRoutes']
+
+  if 'jsonSchemaDefs' not in interfaceDescription :
+    print("Error no jsonSchemaDefs defined for entityInterfaceMapping")
+    print(yaml.dump(interfaceDescription))
+    sys.exit(-1)
+  jsonSchemaDefs = interfaceDescription['jsonSchemaDefs']
+
+  if 'entityType' not in jsonSchemaDefs :
+    print("Error no entityType defined in jsonSchemaDefs")
+    print(yaml.dump(jsonSchemaDefs))
+    sys.exit(-1)
+  entityTypeDef = jsonSchemaDefs['entityType']
+
+  if (
+    'properties' not in entityTypeDef or
+    'entityType' not in entityTypeDef['properties'] or
+    'enum' not in entityTypeDef['properties']['entityType']
+    ) :
+    print("Error no entityType enumeration in entityType definition")
+    print(yaml.dump(entityTypeDef))
+    sys.exit(-1)
+  entityTypeEnum = entityTypeDef['properties']['entityType']['enum']
+ 
+  entityInterfaceMapping = entityInterfaceMapping['example']
+  for entityType, mountPoint in entityInterfaceMapping.items() :
+    if mountPoint not in httpRoutes :
+      print("Error: missing mountPoint [{}] for the entityType [{}]".format(mountPoint, entityType))
+      print("--------------------------------------------------------------------")
+      print(yaml.dump(entityInterfaceMapping))
+      print("--------------------------------------------------------------------")
+      print(yaml.dump(httpRoutes))
+      print("--------------------------------------------------------------------")
+      sys.exit(-1)
+    if entityType not in entityTypeEnum :
+      print("Error: missing entityType [{}] in entityType definition".format(entityType))
+      print("--------------------------------------------------------------------")
+      print(yaml.dump(entityInterfaceMapping))
+      print("--------------------------------------------------------------------")
+      print(yaml.dump(entityTypeDef))
+      print("--------------------------------------------------------------------")
+      sys.exit(-1)
+    
+def checkInterfaceDescription() :
+  checkEntityInterfaceMapping()
+  
+sepTranslator = str.maketrans('/\\', '__')
 includeInterfaceMatcher = re.compile(r"Include\.Interface\:\s\[.+\]\((.+)\)")
 
 def loadInterfaceFile(interfaceFileName) :
   print("Working on {}".format(interfaceFileName))
 
+  shouldCheckInterfaceDescription = False
   if 'name' not in interfaceDescription :
     # the name of the first interface file loaded... wins...
     baseName, extension = os.path.splitext(interfaceFileName)
     interfaceDescription['name'] = baseName.translate(sepTranslator)
-  
+    shouldCheckInterfaceDescription = True
+    
   interface = open(interfaceFileName)
   lines = interface.readlines()
   interface.close()
@@ -329,3 +405,7 @@ def loadInterfaceFile(interfaceFileName) :
         pass
       else :
         insideYaml = True
+
+  if shouldCheckInterfaceDescription :
+    checkInterfaceDescription()
+  
