@@ -1,4 +1,4 @@
-personal_ws-1.1 en 32 
+personal_ws-1.1 en 35 
 AJV
 ComputePods
 JSON
@@ -17,6 +17,9 @@ enum
 exclusiveMaximum
 exclusiveMinimum
 fastapi
+github
+https
+jreese
 maxContains
 maxItems
 maxLength

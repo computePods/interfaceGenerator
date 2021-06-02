@@ -1,4 +1,3 @@
-
 # For file inclusion consider:
 #   https://github.com/jreese/markdown-pp
 

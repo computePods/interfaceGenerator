@@ -1,0 +1,479 @@
+2021/06/02 19:24:01 Micro started
+2021/06/02 19:24:01 Using aspell personal word list: [/home/stg/GitTools/code/computePods/interfaceGenerator/.aspell.pws]
+2021/06/02 19:24:01 runAspell: [python](userdata: 0xc00067f890)
+2021/06/02 19:24:01 aspellCmd: [/home/stg/.local/bin/pyFilteredAspell]
+2021/06/02 19:24:01 aspellCmd: [/home/stg/.local/bin/pyFilteredAspell]
+2021/06/02 19:24:01 option: [nil]
+2021/06/02 19:24:01 option: [pipe]
+2021/06/02 19:24:01 option: [--encoding=utf-8]
+2021/06/02 19:24:01 option: [--mode=python]
+2021/06/02 19:24:01 option: [--sug-mode=normal]
+2021/06/02 19:24:01 option: [--personal=/home/stg/GitTools/code/computePods/interfaceGenerator/.aspell.pws]
+2021/06/02 19:24:01 Using aspell personal word list: [/home/stg/GitTools/code/computePods/interfaceGenerator/.aspell.pws]
+2021/06/02 19:24:01 Using aspell personal word list: [/home/stg/GitTools/code/computePods/interfaceGenerator/.aspell.pws]
+2021/06/02 19:24:01 -----------------------------------------------------------
+2021/06/02 19:24:01 @(#) International Ispell Version 3.1.20 (but really Aspell 0.60.8)
+
+
+& https 87 5: HTTP, Hts, harps, hats, hips, hits, hops, hots, huts, taps, tips, tops, ftps, hat's, hates, heaps, hit's, hoops, hut's, harts, hasps, helps, humps, hurts, hypes, hypos, steps, stops, tarps, turps, types, typos, HP's, hoots, Hart's, harp's, hart's, hatters, hitters, hotpots, hotties, hurt's, Hopis, Topsy, hap's, heats, hip's, hop's, hopes, tap's, tapas, tapes, tip's, tipsy, top's, ATP's, DPs, hatpins, Heep's, Hutu's, hate's, heap's, heat's, hoop's, hoot's, hots's, hasp's, help's, hemp's, hump's, hypo's, step's, stop's, tarp's, typo's, hype's, type's, DP's, Hattie's, Hettie's, hatter's, hitter's, Hope's, Hopi's, Tupi's, hope's, tape's
+& github 22 13: GitHub, git hub, git-hub, GitHub's, Goth, girth, goth, grub, Gothic, Goths, girths, goths, kith, Goth's, Gotham, girth's, gather, kith's, Garth, Kieth, cub, Keith
+& jreese 35 24: Reese, Crees, Greece, crease, grease, Cree's, crews, juries, Jr's, Jesse, geese, greaser, reuse, frees, trees, cress, cries, cruse, greys, grues, Greene, breeze, freeze, Gere's, Jeri's, Cruise, cruise, greasy, grouse, Greer's, crew's, tree's, Grey's, grey's, cress's
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2021/06/02 19:24:01 -----------------------------------------------------------
+2021/06/02 19:25:10 runAspell: [python](userdata: 0xc00030aea0)
+2021/06/02 19:25:10 aspellCmd: [/home/stg/.local/bin/pyFilteredAspell]
+2021/06/02 19:25:10 aspellCmd: [/home/stg/.local/bin/pyFilteredAspell]
+2021/06/02 19:25:10 option: [nil]
+2021/06/02 19:25:10 option: [pipe]
+2021/06/02 19:25:10 option: [--encoding=utf-8]
+2021/06/02 19:25:10 option: [--mode=python]
+2021/06/02 19:25:10 option: [--sug-mode=normal]
+2021/06/02 19:25:10 option: [--personal=/home/stg/GitTools/code/computePods/interfaceGenerator/.aspell.pws]
+2021/06/02 19:25:10 -----------------------------------------------------------
+2021/06/02 19:25:10 @(#) International Ispell Version 3.1.20 (but really Aspell 0.60.8)
+
+
+& github 22 13: GitHub, git hub, git-hub, GitHub's, Goth, girth, goth, grub, Gothic, Goths, girths, goths, kith, Goth's, Gotham, girth's, gather, kith's, Garth, Kieth, cub, Keith
+& jreese 35 24: Reese, Crees, Greece, crease, grease, Cree's, crews, juries, Jr's, Jesse, geese, greaser, reuse, frees, trees, cress, cries, cruse, greys, grues, Greene, breeze, freeze, Gere's, Jeri's, Cruise, cruise, greasy, grouse, Greer's, crew's, tree's, Grey's, grey's, cress's
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2021/06/02 19:25:10 -----------------------------------------------------------
+2021/06/02 19:25:13 runAspell: [python](userdata: 0xc0004f2f00)
+2021/06/02 19:25:13 aspellCmd: [/home/stg/.local/bin/pyFilteredAspell]
+2021/06/02 19:25:13 aspellCmd: [/home/stg/.local/bin/pyFilteredAspell]
+2021/06/02 19:25:13 option: [nil]
+2021/06/02 19:25:13 option: [pipe]
+2021/06/02 19:25:13 option: [--encoding=utf-8]
+2021/06/02 19:25:13 option: [--mode=python]
+2021/06/02 19:25:13 option: [--sug-mode=normal]
+2021/06/02 19:25:13 option: [--personal=/home/stg/GitTools/code/computePods/interfaceGenerator/.aspell.pws]
+2021/06/02 19:25:13 -----------------------------------------------------------
+2021/06/02 19:25:13 @(#) International Ispell Version 3.1.20 (but really Aspell 0.60.8)
+
+
+& jreese 35 24: Reese, Crees, Greece, crease, grease, Cree's, crews, juries, Jr's, Jesse, geese, greaser, reuse, frees, trees, cress, cries, cruse, greys, grues, Greene, breeze, freeze, Gere's, Jeri's, Cruise, cruise, greasy, grouse, Greer's, crew's, tree's, Grey's, grey's, cress's
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2021/06/02 19:25:13 -----------------------------------------------------------
+2021/06/02 19:25:19 runAspell: [python](userdata: 0xc0006af560)
+2021/06/02 19:25:19 aspellCmd: [/home/stg/.local/bin/pyFilteredAspell]
+2021/06/02 19:25:19 aspellCmd: [/home/stg/.local/bin/pyFilteredAspell]
+2021/06/02 19:25:19 option: [nil]
+2021/06/02 19:25:19 option: [pipe]
+2021/06/02 19:25:19 option: [--encoding=utf-8]
+2021/06/02 19:25:19 option: [--mode=python]
+2021/06/02 19:25:19 option: [--sug-mode=normal]
+2021/06/02 19:25:19 option: [--personal=/home/stg/GitTools/code/computePods/interfaceGenerator/.aspell.pws]
+2021/06/02 19:25:19 -----------------------------------------------------------
+2021/06/02 19:25:19 @(#) International Ispell Version 3.1.20 (but really Aspell 0.60.8)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2021/06/02 19:25:19 -----------------------------------------------------------
+2021/06/02 19:33:22 runAspell: [python](userdata: 0xc0004f2c00)
+2021/06/02 19:33:22 aspellCmd: [/home/stg/.local/bin/pyFilteredAspell]
+2021/06/02 19:33:22 aspellCmd: [/home/stg/.local/bin/pyFilteredAspell]
+2021/06/02 19:33:22 option: [nil]
+2021/06/02 19:33:22 option: [pipe]
+2021/06/02 19:33:22 option: [--encoding=utf-8]
+2021/06/02 19:33:22 option: [--mode=python]
+2021/06/02 19:33:22 option: [--sug-mode=normal]
+2021/06/02 19:33:22 option: [--personal=/home/stg/GitTools/code/computePods/interfaceGenerator/.aspell.pws]
+2021/06/02 19:33:23 -----------------------------------------------------------
+2021/06/02 19:33:23 @(#) International Ispell Version 3.1.20 (but really Aspell 0.60.8)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2021/06/02 19:33:23 -----------------------------------------------------------
