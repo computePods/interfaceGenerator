@@ -1,27 +1,93 @@
 // This is a collection of Mithril connectors mixins for the
 // {{ options['interfaceName'] }} interface.
 
-// The function associated with each prefix is a "factory" which returns a 
+// The function associated with each prefix is a "factory" which returns a
 // mixin object to be mixed-in to the ultimate Mithril Component.
 
-// Each of the mixin objects contains a getDataFromServer method which 
-// "remembers" the URL which was originally passed to the "factory" method 
-// when it create the mixin. 
+// Each of the mixin objects contains a getDataFromServer method which
+// "remembers" the URL which was originally passed to the "factory" method
+// when it create the mixin.
+
+import m from 'mithril'
+
+{% for aRootType in rootTypeFiles %}
+import { {{ aRootType}}_validate } from './{{ rootTypeFiles[aRootType] }}'
+{% endfor %}
+
+function none_validate(someJson) { return true }
+
+export const mountPointRouteParts = {
+  {% for aMountPoint in httpRoutes %}
+  "{{ httpRoutes[aMountPoint]['mountPoint'] }}": [{% for aPart in httpRoutes[aMountPoint]['routeParts'] %}
+    '{{ aPart }}',{% endfor %}
+  ],
+  {% endfor %}
+}
+
+export function buildUrl(
+  entityUrlParts, /* a dict/object of url parts */
+  restServer=null /* an optional restServer option to override any value
+                     in entityUrlParts */
+) {
+  if (!entityUrlParts.hasOwnProperty('mountPoint')) return null
+
+  if (!restServer) {
+    restServer = ''
+    if (entityUrlParts.hasOwnProperty('restServer')) {
+      restServer = entityUrlParts['restServer']
+    }
+  }
+
+  var theUrlParts = []
+  theUrlParts.push(entityUrlParts['mountPoint'])
+
+  for (var aPartKey of mountPointRouteParts[entityUrlParts['mountPoint']]) {
+    if (!entityUrlParts.hasOwnProperty(aPartKey)) return null
+    if (entityUrlParts[aPartKey] == '') return null
+
+    theUrlParts.push(entityUrlParts[aPartKey])
+  }
+  return restServer+(theUrlParts.join('/'))
+}
 
 export const connectorMixins = {
 {% for aMountPoint in httpRoutes %}
 {%   for anAction in httpRoutes[aMountPoint].actions %}
-  "{{ aMountPoint }}": function( entityUrl ) {
-    "{{ anAction | lower }}ServerData": function() {
-      m.request({
-        method: "{{ anAction }}",
-        url: entityUrl,
-        {% if anAction == "PUT" %}body: requestBody,{% endif %}
-      }).then(function(result) {
-        console.dir(result, {depth: null, colors: true});
-        this.data = result
-      })
+  "{{ httpRoutes[aMountPoint]['mountPoint'] }}": function(
+    entityUrlParts, /* dict of path parts */
+    restServer=null
+  ) {
+    entityUrlParts['mountPoint'] = '{{ httpRoutes[aMountPoint]['mountPoint'] }}'
+    var theModel = {
+      entityType: '{{ httpRoutes[aMountPoint]['mountPoint'] }}',
+      "{{ anAction | lower }}ServerData": function({% if anAction == "PUT" %}requestBody{% endif %}) {
+        var theUrl = buildUrl(entityUrlParts, restServer)
+        if (!theUrl) {
+          console.log("Could not build URL for:")
+          console.log(entityUrlParts, restServer)
+          return
+        }
+        m.request({
+          method: "{{ anAction }}",
+          url: theUrl,
+          {% if anAction == "PUT" %}body: requestBody,{% endif %}
+        }).then(function(result) {
+          console.log("----------------------------------------------------")
+          console.log("result from connectorMixins")
+          console.log(entityUrlParts, restServer)
+          console.log(theUrl)
+          console.log(result);
+          console.log("----------------------------------------------------")
+          try {
+            {{ httpRoutes[aMountPoint].response }}_validate(result)
+          } catch (err) {
+            console.log(err)
+          }
+          theModel.data = result
+        })
+      }
     }
+    return theModel
   },
 {%   endfor %}
 {% endfor %}

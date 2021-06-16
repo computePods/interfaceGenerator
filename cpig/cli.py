@@ -15,11 +15,11 @@ def loadConfig(configFile, verbose) :
       'distDir' : 'dist',
       'outputPathTemplates' : {
         'pydantic'           : [ 'python', '{}.py' ],
-        'ajv'                : [ 'js',     '{}_ajv.js' ],
+        'ajv'                : [ 'js',     '{}_ajv.mjs' ],
         'pythonExamples'     : [ 'python', '{}Examples.py' ],
-        'javaScriptExamples' : [ 'js',     '{}Examples.js' ],
-        'mockServiceWorkers' : [ 'js',     '{}Msw.js' ],
-        'mithrilConnectors'  : [ 'js',     '{}MithrilConnectors.js']
+        'javaScriptExamples' : [ 'js',     '{}Examples.mjs' ],
+        'mockServiceWorkers' : [ 'js',     '{}Msw.mjs' ],
+        'mithrilConnectors'  : [ 'js',     '{}MithrilConnectors.mjs']
       },
     }
   }
@@ -51,30 +51,34 @@ def loadConfig(configFile, verbose) :
 @click.pass_context
 def cli(ctx, configFile, verbose, interface_name):
   """
-  A simple Python tool to generate computer readable Python and JavaScript 
-  interfaces from Markdown/YAML descriptions. 
+  A simple Python tool to generate computer readable Python and JavaScript
+  interfaces from Markdown/YAML descriptions.
   """
 
   config = loadConfig(configFile, verbose)
+  config['outputFiles'] = {}
 
   cpig.loadInterface.loadInterfaceFile(interface_name)
 
   cpig.generateCode.pydantic(
     config,
-    cpig.loadInterface.interfaceDescription    
+    cpig.loadInterface.interfaceDescription
   )
 
   cpig.generateCode.runSchemaTemplates(
     config,
-    cpig.loadInterface.interfaceDescription    
+    cpig.loadInterface.interfaceDescription
+  )
+
+  # We run the httpRoutes first as the examples my need to import/require
+  # these files.
+
+  cpig.generateCode.runHttpRouteTemplates(
+    config,
+    cpig.loadInterface.interfaceDescription
   )
 
   cpig.generateCode.runExampleTemplates(
     config,
-    cpig.loadInterface.interfaceDescription    
-  )
-
-  cpig.generateCode.runHttpRouteTemplates(
-    config,
-    cpig.loadInterface.interfaceDescription    
+    cpig.loadInterface.interfaceDescription
   )

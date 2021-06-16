@@ -1,9 +1,9 @@
-// This is the ajv validator based upon the {{ schema['title']}} JSON schema 
+// This is the ajv validator based upon the {{ schema['title']}} JSON schema
 
-{% if options['useRequire'] %} 
+{% if options['useRequire'] %}
 const Avj = require("ajv")
 {% else %}
-import ajv as Ajv
+import Ajv from 'ajv'
 {% endif %}
 
 /********************************************************************
@@ -15,5 +15,5 @@ const schema = {{ schema | tojson(2) }}
 
 const ajv = new Ajv({{ options['ajvOptions'] | tojson(2) }})
 
-const {{ options['rootType'] }}_validate = ajv.compile(schema)
+export const {{ options['rootType'] }}_validate = ajv.compile(schema)
 

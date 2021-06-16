@@ -12,7 +12,7 @@ import yaml
 
 # We validate the following schema using: jsonschema.Draft7Validator
 # see: https://stackoverflow.com/a/13826826
-# 
+#
 interfaceSchemasYaml = """
   jsonSchemaPreamble:
     # is a dictionary of jsonType -> JSON Schema preamble strings
@@ -21,11 +21,11 @@ interfaceSchemasYaml = """
       type: dictionary
       items:
         type: string
-      
+
   jsonSchemaDefs:
     # is a dictionary of jsonType -> JSON Schema definitions
     type: dictionary
-    items: 
+    items:
       type: draft7  # A (draft 7) JSON Schema
 
   jsonExamplesHeader:
@@ -48,14 +48,14 @@ interfaceSchemasYaml = """
              - POST
              - PUT
              - DELETE
-  
+
   httpRoutes:
-    # is a dictionary of mountPoints -> httpRoutes 
+    # is a dictionary of mountPoints -> httpRoutes
     type: dictionary
     items:
       # an httpRoute is a dictionary of:
       #  - a list of actions (GET, POST, PUT, DELETE)
-      #  - a declaration of the request/response body format 
+      #  - a declaration of the request/response body format
       #    as a jsonType in the jsonSchemaDefs
       #  - the url template (which may include <name> elements)
       #
@@ -66,10 +66,10 @@ interfaceSchemasYaml = """
       properties:
         body:
           # the name of a jsonType in the jsonSchemaDefs
-          type: string 
+          type: string
         url:
           # the url template for this mount point
-          type: string 
+          type: string
         actions:
           type: array
           items:
@@ -88,7 +88,7 @@ def validateJsonData(jsonData, aSchemaName) :
     print("Interface schema name {} has not been defined".format(aSchemaName))
     print(yaml.dump(jsonData))
     return
-    
+
   if aSchemaName == 'jsonSchemaDefs' :
     validateSchema(aSchemaName, jsonData)
     return
@@ -122,7 +122,7 @@ def validateSchema(aSchemaName, aSchema) :
 
 def normalizeJsonSchema(aJsonSchema) :
   #
-  # We translate our version of 'dictionaries' to the official JSON schema 
+  # We translate our version of 'dictionaries' to the official JSON schema
   # version as suggested by:
   #
   # https://stackoverflow.com/questions/27357861/dictionary-like-json-schema
@@ -139,6 +139,33 @@ def normalizeJsonSchema(aJsonSchema) :
 
   for aKey, aValue in aJsonSchema.items() :
     normalizeJsonSchema(aValue)
+
+def normalizeHttpRoutes(someHttpRoutes) :
+  #
+  # We expand the route into its constituent parts
+  #
+  if type(someHttpRoutes) is not dict :
+    return
+
+  if 'httpRoutes' not in someHttpRoutes :
+    return
+  httpRoutes = someHttpRoutes['httpRoutes']
+
+  for mountPointName, mpDetails in someHttpRoutes['httpRoutes'].items() :
+    if 'route' in mpDetails :
+      routeDirs = mpDetails['route'].split('/')
+      mountPoint = ""
+      routeParts = []
+      i = 0
+      while i < len(routeDirs) and not routeDirs[i].startswith('<') :
+        if routeDirs[i] != '' :
+          mountPoint = mountPoint+'/'+routeDirs[i]
+        i = i + 1
+      while i < len(routeDirs) :
+        routeParts.append(routeDirs[i].strip('<>'))
+        i = i + 1
+      mpDetails['mountPoint'] = mountPoint
+      mpDetails['routeParts'] = routeParts
 
 def loadInterfaceSchemas() :
   global interfaceSchemas
@@ -202,7 +229,7 @@ def normalizeJsonExample(newYamlData) :
           exampleKey : [ exampleValue ]
         }
       }
-      
+
   print("ERROR we should not have got here!")
   return None
 
@@ -213,7 +240,7 @@ def mergeYamlData(yamlData, newYamlData, thePath) :
   if type(yamlData) is None :
     print("ERROR yamlData should NEVER be None ")
     sys.exit(-1)
-    
+
   if type(yamlData) != type(newYamlData) :
     print("Incompatible types {} and {} while trying to merge YAML data at {}".format(type(yamlData), type(newYamlData), thePath))
     print("Stoping merge at {}".format(thePath))
@@ -274,6 +301,7 @@ def addYamlBlock(yamlLines) :
   elif 'httpRoutes' in newYamlData[0] :
     newYamlData = newYamlData[0]
     validateJsonData(newYamlData, 'httpRoutes')
+    normalizeHttpRoutes(newYamlData)
   elif 'natsChannels' in newYamlData :
     newYamlData = newYamlData[0]
     validateJsonData(newYamlData, 'natsChannels')
@@ -300,9 +328,9 @@ def checkEntityInterfaceMapping() :
   #
   # AND all of the mount points MUST have been defined
   #
-  # AND all of the entityTypes MUST have been deinfed in the entityType 
-  #     definition 
-  
+  # AND all of the entityTypes MUST have been deinfed in the entityType
+  #     definition
+
   if 'jsonExamples' not in interfaceDescription :
     print("Error no entityInterfaceMapping found (no jsonExamples)")
     print(yaml.dump(interfaceDescription))
@@ -347,7 +375,7 @@ def checkEntityInterfaceMapping() :
     print(yaml.dump(entityTypeDef))
     sys.exit(-1)
   entityTypeEnum = entityTypeDef['properties']['entityType']['enum']
- 
+
   entityInterfaceMapping = entityInterfaceMapping['example']
   for entityType, mountPoint in entityInterfaceMapping.items() :
     if mountPoint not in httpRoutes :
@@ -366,10 +394,10 @@ def checkEntityInterfaceMapping() :
       print(yaml.dump(entityTypeDef))
       print("--------------------------------------------------------------------")
       sys.exit(-1)
-    
+
 def checkInterfaceDescription() :
   checkEntityInterfaceMapping()
-  
+
 sepTranslator = str.maketrans('/\\', '__')
 includeInterfaceMatcher = re.compile(r"Include\.Interface\:\s\[.+\]\((.+)\)")
 
@@ -382,7 +410,7 @@ def loadInterfaceFile(interfaceFileName) :
     baseName, extension = os.path.splitext(interfaceFileName)
     interfaceDescription['name'] = baseName.translate(sepTranslator)
     shouldCheckInterfaceDescription = True
-    
+
   interface = open(interfaceFileName)
   lines = interface.readlines()
   interface.close()
@@ -408,4 +436,3 @@ def loadInterfaceFile(interfaceFileName) :
 
   if shouldCheckInterfaceDescription :
     checkInterfaceDescription()
-  

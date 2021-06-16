@@ -31,7 +31,7 @@ def loadTemplate(options, generationType, generationDetails) :
     print("No jinja2 template found for {} [{}]".format(generationType, jinjaTemplatePath))
     return [ None, jinjaTemplatePath ]
 
-  try : 
+  try :
     theTemplate = jinja2.Template(theTemplateStr)
   except Exception as ex :
     print("Could not create the Jinja2 template [{}]".format(jinjaTemplatePath))
@@ -42,7 +42,7 @@ def loadTemplate(options, generationType, generationDetails) :
 
 def getOutputPaths(options, generationType, generationDetails) :
   distDir = options['distDir']
-  
+
   if 'outputPathTemplate' not in generationDetails :
     outputPathTemplates = options['outputPathTemplates']
     if generationType not in outputPathTemplates :
@@ -56,7 +56,7 @@ def getOutputPaths(options, generationType, generationDetails) :
   outputPathTemplate.insert(0, distDir)
   outputPathTemplate = os.path.join(*outputPathTemplate)
   outputDir = os.path.dirname(outputPathTemplate)
-  
+
   return [ outputDir, outputPathTemplate ]
 
 def jsonSchemaGenerator(options, interfaceDefinition) :
@@ -66,7 +66,7 @@ def jsonSchemaGenerator(options, interfaceDefinition) :
   preambles = { }
   if 'jsonSchemaPreambles' in interfaceDefinition :
     preambles = interfaceDefinition['jsonSchemaPreambles']
-  
+
   if 'jsonSchemaDefs' not in interfaceDefinition :
     if 1 < options['verbose'] :
       print("NO jsonSchemaDefs found in {}".format(interfaceName))
@@ -83,7 +83,7 @@ def jsonSchemaGenerator(options, interfaceDefinition) :
   if 2 < options['verbose'] :
     print("rootTypes:")
     print(yaml.dump(rootTypes))
-    
+
   for aRootType in rootTypes :
     if aRootType not in defs :
       continue
@@ -91,7 +91,7 @@ def jsonSchemaGenerator(options, interfaceDefinition) :
     somePreamble = {}
     if aRootType in preambles :
       somePreamble.update(preambles[aRootType])
-      
+
     jsonSchema = {}
     for aKey, aValue in somePreamble.items() :
       jsonSchema[aKey] = copy.deepcopy(aValue)
@@ -131,10 +131,11 @@ def pydantic(config, interfaceDefinition) :
 
   for aRootType, aJsonSchema in jsonSchemaGenerator(options, interfaceDefinition) :
     outputPath = outputPathTemplate.format(aRootType)
+    config['outputFiles'][aRootType+'-rootType-py'] = os.path.basename(outputPath)
     os.makedirs(outputDir, exist_ok=True)
     print("Generating pydantic {} to {}".format(aRootType, outputPath))
     print("---------------------------------------------------------")
-    try: 
+    try:
       datamodel_code_generator.generate(
         json.dumps(aJsonSchema),
         output=pathlib.Path(outputPath),
@@ -160,7 +161,7 @@ def runSchemaTemplates(config, interfaceDefinition) :
     return
   generatorOptions = generatorOptions['genSchema']
   del generatorOptions['pydantic']
-  
+
   for generationType, generationDetails in generatorOptions.items() :
     if 1 < config['options']['verbose'] :
       print("Running {} schema templates on {}".format(generationType, interfaceName))
@@ -169,24 +170,26 @@ def runSchemaTemplates(config, interfaceDefinition) :
       options, generationType, generationDetails)
     if theTemplate is None :
       continue
-      
+
     outputDir, outputPathTemplate = getOutputPaths(
       options, generationType, generationDetails)
     if outputDir is None :
       continue
-      
+
     for aRootType, aJsonSchema in jsonSchemaGenerator(options, interfaceDefinition) :
       outputPath = outputPathTemplate.format(aRootType)
+      config['outputFiles'][aRootType+'-rootType-js'] = os.path.basename(outputPath)
       os.makedirs(outputDir, exist_ok=True)
       print("Generating {} {} to {}".format(generationType, aRootType, outputPath))
       print("---------------------------------------------------------")
 
       generationDetails['interfaceName'] = interfaceName
       generationDetails['rootType'] = aRootType
-      try : 
+      try :
         renderedStr = theTemplate.render({
-          'options' : generationDetails,
-          'schema'  : aJsonSchema,
+          'options'     : generationDetails,
+          'outputFiles' : config['outputFiles'],
+          'schema'      : aJsonSchema,
         })
         with open(outputPath, 'w') as outFile :
           outFile.write(renderedStr)
@@ -199,7 +202,7 @@ spaceTranslator = str.maketrans(' ', '_')
 def runExampleTemplates(config, interfaceDefinition) :
 
   interfaceName = interfaceDefinition['name']
-  
+
   if 'jsonExamples' not in interfaceDefinition :
     return
 
@@ -217,13 +220,14 @@ def runExampleTemplates(config, interfaceDefinition) :
 
     theTemplate, jinjaTemplatePath = loadTemplate(
       options, generationType, generationDetails)
-    
+
     outputDir, outputPathTemplate = getOutputPaths(
       options, generationType, generationDetails)
     if outputDir is None :
       continue
 
     outputPath = outputPathTemplate.format(interfaceName)
+    config['outputFiles'][generationType+'-examples'] = os.path.basename(outputPath)
     os.makedirs(outputDir, exist_ok=True)
     print("Generating {} {} to {}".format(generationType, interfaceName, outputPath))
     print("---------------------------------------------------------")
@@ -232,16 +236,17 @@ def runExampleTemplates(config, interfaceDefinition) :
       exampleNum = 0
       for anExample in exampleDetails :
         exampleNum += 1
-        if 'title' in anExample : 
+        if 'title' in anExample :
           anExample['name'] = anExample['title'].translate(spaceTranslator)
         else :
           anExample['name'] = "{}_{}".format(interfaceName, exampleNum)
 
     generationDetails['interfaceName'] = interfaceName
-    try : 
+    try :
       renderedStr = theTemplate.render({
-        'options'  : generationDetails,
-        'examples' : jsonExamples,
+        'options'     : generationDetails,
+        'outputFiles' : config['outputFiles'],
+        'examples'    : jsonExamples,
       })
       with open(outputPath, 'w') as outFile :
         outFile.write(renderedStr)
@@ -251,11 +256,15 @@ def runExampleTemplates(config, interfaceDefinition) :
 
 def runHttpRouteTemplates(config, interfaceDefinition) :
   interfaceName = interfaceDefinition['name']
-  
+
   if 'httpRoutes' not in interfaceDefinition :
     return
-    
   httpRoutes = interfaceDefinition['httpRoutes']
+
+  if 'jsonSchemaDefs' not in interfaceDefinition :
+    return
+  jsonSchemaDefs = interfaceDefinition['jsonSchemaDefs']
+
   #
   # setup the collection of generators for our use...
   #
@@ -269,22 +278,33 @@ def runHttpRouteTemplates(config, interfaceDefinition) :
 
     theTemplate, jinjaTemplatePath = loadTemplate(
       options, generationType, generationDetails)
-    
+
     outputDir, outputPathTemplate = getOutputPaths(
       options, generationType, generationDetails)
     if outputDir is None :
       continue
 
     outputPath = outputPathTemplate.format(interfaceName)
+    config['outputFiles'][generationType+'-httproutes'] = os.path.basename(outputPath)
     os.makedirs(outputDir, exist_ok=True)
     print("Generating {} {} to {}".format(generationType, interfaceName, outputPath))
     print("---------------------------------------------------------")
 
+    rootTypeFiles = {}
+    for anOutputKey, anOutputFile in config['outputFiles'].items() :
+      if anOutputKey.endswith('-rootType-js') :
+        rootTypeFiles[anOutputKey.split('-')[0]] = anOutputFile
+
     generationDetails['interfaceName'] = interfaceName
-    try : 
+    try :
+      print(yaml.dump(config['outputFiles']))
+      print(yaml.dump(rootTypeFiles))
       renderedStr = theTemplate.render({
-        'options'    : generationDetails,
-        'httpRoutes' : httpRoutes,
+        'options'        : generationDetails,
+        'outputFiles'    : config['outputFiles'],
+        'rootTypeFiles'  : rootTypeFiles,
+        'httpRoutes'     : httpRoutes,
+        'jsonSchemaDefs' : jsonSchemaDefs,
       })
       with open(outputPath, 'w') as outFile :
         outFile.write(renderedStr)

@@ -1,21 +1,38 @@
 // This is the collection of {{ options['interfaceName'] }} mock service workers
 
+// see: https://mswjs.io/docs/getting-started/mocks/rest-api
+// see: https://mswjs.io/docs/api/setup-worker
+
 import { rest } from 'msw'
+import { buildUrl, connectorMixins } from './{{ outputFiles['mithrilConnectors-httproutes'] }}'
 
-export const {{options['interfaceName']}}_handlers = [
+export const {{options['interfaceName']}}_examples = {
 {% for exampleType in examples %}
-  // {{ exampleType }} handlers
+  // {{ exampleType }} examples
   {% for anExample in examples[exampleType] %}{%   if anExample['httpRoutes'] %}
-    // {{ anExample['title'] }}
-    rest.{{anExample['httpRoutes']['action'] | lower }}('{{anExample['httpRoutes']['route']}}', (req, res, ctx) => {
-    	
-      return res(
-      	ctx.status(200),
-      	ctx.json({{ anExample['example'] | tojson(2) | indent("        ")}}),
-      )
-
-    }),
+    "{{ anExample['title'] }}" : function(restServer) {
+      return connectorMixins['{{ anExample['httpRoutes']['route']['mountPoint']}}']({{ anExample['httpRoutes']['route'] }}, restServer)
+    },
   {%   endif %}{% endfor %}
 {% endfor %}
-]
+}
+
+export function {{options['interfaceName']}}_handlers(restServer) {
+  return [
+  {% for exampleType in examples %}
+    // {{ exampleType }} handlers
+    {% for anExample in examples[exampleType] %}{%   if anExample['httpRoutes'] %}
+      // {{ anExample['title'] }}
+      rest.{{anExample['httpRoutes']['action'] | lower }}(buildUrl({{ anExample['httpRoutes']['route'] }}, restServer), (req, res, ctx) => {
+
+        return res(
+          ctx.status(200),
+          ctx.json({{ anExample['example'] | tojson(2) | indent("          ")}}),
+        )
+
+      }),
+    {%   endif %}{% endfor %}
+  {% endfor %}
+  ]
+}
 
