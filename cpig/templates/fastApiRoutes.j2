@@ -1,0 +1,28 @@
+# This is a collection of Python decorators for the
+# {{ options['interfaceName'] }} interface.
+
+def add{{ options['interfaceName'] }}Interface(appSelf) :
+
+{% for aMountPoint in httpRoutes %}
+{%   for anAction in httpRoutes[aMountPoint].actions %}
+
+  def {{ anAction | lower }}{{ httpRoutes[aMountPoint].mountPoint | replace('/','_') }}(implFunc):
+    return appSelf.{{ anAction | lower }}(
+      '{{ httpRoutes[aMountPoint].mountPoint }}{% if httpRoutes[aMountPoint].routeParts %}/{{ '{' }}{{ httpRoutes[aMountPoint].routeParts | join('}/{') }}{{ '}' }}{% endif %}',
+      implFunc
+    )
+
+  appSelf.{{ anAction | lower }}{{ httpRoutes[aMountPoint].mountPoint | replace('/','_') }} = {{ anAction | lower }}{{ httpRoutes[aMountPoint].mountPoint | replace('/','_') }}
+
+  """
+  Example use:
+
+    @{{ anAction | lower }}{{ httpRoutes[aMountPoint].mountPoint | replace('/','_') }}
+    async def {{ anAction | lower }}{{ httpRoutes[aMountPoint].mountPoint | replace('/','_') }}_impl({{ httpRoutes[aMountPoint].routeParts | join(', ') }}) :
+      {{ httpRoutes[aMountPoint].response }} = { .... }
+      # do something and then return {{ httpRoutes[aMountPoint].response }} ...
+      return {{ httpRoutes[aMountPoint].response }}
+  """
+
+{%   endfor %}
+{% endfor %}

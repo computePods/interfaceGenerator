@@ -1,6 +1,5 @@
 # For file inclusion consider:
 #   https://github.com/jreese/markdown-pp
-
 import click
 import copy
 import cpig.loadInterface
@@ -19,7 +18,8 @@ def loadConfig(configFile, verbose) :
         'pythonExamples'     : [ 'python', '{}Examples.py' ],
         'javaScriptExamples' : [ 'js',     '{}Examples.mjs' ],
         'mockServiceWorkers' : [ 'js',     '{}Msw.mjs' ],
-        'mithrilConnectors'  : [ 'js',     '{}MithrilConnectors.mjs']
+        'mithrilConnectors'  : [ 'js',     '{}MithrilConnectors.mjs'],
+        'fastApiRoutes'      : [ 'python', '{}FastApiRoutes.py']
       },
     }
   }

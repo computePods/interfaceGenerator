@@ -297,8 +297,8 @@ def runHttpRouteTemplates(config, interfaceDefinition) :
 
     generationDetails['interfaceName'] = interfaceName
     try :
-      print(yaml.dump(config['outputFiles']))
-      print(yaml.dump(rootTypeFiles))
+      #print(yaml.dump(config['outputFiles']))
+      #print(yaml.dump(rootTypeFiles))
       renderedStr = theTemplate.render({
         'options'        : generationDetails,
         'outputFiles'    : config['outputFiles'],
