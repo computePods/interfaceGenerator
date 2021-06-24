@@ -205,8 +205,12 @@ def runExampleTemplates(config, interfaceDefinition) :
 
   if 'jsonExamples' not in interfaceDefinition :
     return
-
   jsonExamples = interfaceDefinition['jsonExamples']
+
+  if 'httpRoutes' not in interfaceDefinition :
+    return
+  httpRoutes = interfaceDefinition['httpRoutes']
+
   #
   # setup the collection of generators for our use...
   #
@@ -247,6 +251,7 @@ def runExampleTemplates(config, interfaceDefinition) :
         'options'     : generationDetails,
         'outputFiles' : config['outputFiles'],
         'examples'    : jsonExamples,
+        'httpRoutes'  : httpRoutes,
       })
       with open(outputPath, 'w') as outFile :
         outFile.write(renderedStr)

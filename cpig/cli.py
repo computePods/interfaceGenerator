@@ -19,7 +19,8 @@ def loadConfig(configFile, verbose) :
         'javaScriptExamples' : [ 'js',     '{}Examples.mjs' ],
         'mockServiceWorkers' : [ 'js',     '{}Msw.mjs' ],
         'mithrilConnectors'  : [ 'js',     '{}MithrilConnectors.mjs'],
-        'fastApiRoutes'      : [ 'python', '{}FastApiRoutes.py']
+        'fastApiRoutes'      : [ 'python', '{}FastApiRoutes.py'],
+        'fastApiExamples'    : [ 'python', '{}FastApiExamples.py']
       },
     }
   }

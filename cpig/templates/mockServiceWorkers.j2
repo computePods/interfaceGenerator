@@ -10,20 +10,20 @@ export const {{options['interfaceName']}}_examples = {
 {% for exampleType in examples %}
   // {{ exampleType }} examples
   {% for anExample in examples[exampleType] %}{%   if anExample['httpRoutes'] %}
-    "{{ anExample['title'] }}" : function(restServer) {
-      return connectorMixins['{{ anExample['httpRoutes']['route']['mountPoint']}}']({{ anExample['httpRoutes']['route'] }}, restServer)
+    "{{ anExample['title'] }}" : function() {
+      return connectorMixins['{{ anExample['httpRoutes']['route']['mountPoint']}}']({{ anExample['httpRoutes']['route'] }})
     },
   {%   endif %}{% endfor %}
 {% endfor %}
 }
 
-export function {{options['interfaceName']}}_handlers(restServer) {
+export function {{options['interfaceName']}}_handlers() {
   return [
   {% for exampleType in examples %}
     // {{ exampleType }} handlers
     {% for anExample in examples[exampleType] %}{%   if anExample['httpRoutes'] %}
       // {{ anExample['title'] }}
-      rest.{{anExample['httpRoutes']['action'] | lower }}(buildUrl({{ anExample['httpRoutes']['route'] }}, restServer), (req, res, ctx) => {
+      rest.{{anExample['httpRoutes']['action'] | lower }}(buildUrl({{ anExample['httpRoutes']['route'] }}), (req, res, ctx) => {
 
         return res(
           ctx.status(200),

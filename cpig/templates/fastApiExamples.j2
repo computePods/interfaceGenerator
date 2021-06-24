@@ -1,0 +1,43 @@
+# This is a collection of FastAPI based example routes for the
+# {{ options['interfaceName'] }} interface.
+
+mountPointRouteParts = {
+  {% for aMountPoint in httpRoutes %}
+  "{{ httpRoutes[aMountPoint]['mountPoint'] }}": [{% for aPart in httpRoutes[aMountPoint]['routeParts'] %}
+    '{{ aPart }}',{% endfor %}
+  ],
+  {% endfor %}
+}
+
+def buildUrl(urlDict) :
+
+  if 'mountPoint' not in urlDict :
+    return '/'
+  mountPoint = urlDict['mountPoint']
+
+  if mountPoint not in mountPointRouteParts :
+    return '/'
+  routeParts = mountPointRouteParts[mountPoint]
+
+  theUrl = [ mountPoint ]
+  for aRoutePart in routeParts :
+    if aRoutePart not in urlDict :
+      return theUrl.join('/')
+    theUrl.append( urlDict[aRoutePart] )
+  return '/'.join(theUrl).replace('//','/')
+
+def add{{ options['interfaceName'] }}Examples(appSelf) :
+
+  {% for exampleType in examples %}
+  #########################################################################
+  # {{ exampleType }} handlers
+  {% for anExample in examples[exampleType] %}{%   if anExample.httpRoutes %}
+  # {{ anExample.title }}
+  @appSelf.{{ anExample.httpRoutes.action | lower }}(buildUrl(
+    {{ anExample.httpRoutes.route | tojson(2) | indent("     ") }}
+  ))
+  def {{ exampleType }}_{{ loop.index }}() :
+    return {{ anExample.example | tojson(2) | indent("    ")}}
+
+  {% endif %}{% endfor %}
+  {% endfor %}

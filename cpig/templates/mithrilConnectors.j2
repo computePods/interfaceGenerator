@@ -26,17 +26,8 @@ export const mountPointRouteParts = {
 
 export function buildUrl(
   entityUrlParts, /* a dict/object of url parts */
-  restServer=null /* an optional restServer option to override any value
-                     in entityUrlParts */
 ) {
   if (!entityUrlParts.hasOwnProperty('mountPoint')) return null
-
-  if (!restServer) {
-    restServer = ''
-    if (entityUrlParts.hasOwnProperty('restServer')) {
-      restServer = entityUrlParts['restServer']
-    }
-  }
 
   var theUrlParts = []
   theUrlParts.push(entityUrlParts['mountPoint'])
@@ -47,7 +38,7 @@ export function buildUrl(
 
     theUrlParts.push(entityUrlParts[aPartKey])
   }
-  return restServer+(theUrlParts.join('/'))
+  return theUrlParts.join('/').replaceAll('//','/')
 }
 
 export const connectorMixins = {
@@ -55,16 +46,15 @@ export const connectorMixins = {
 {%   for anAction in httpRoutes[aMountPoint].actions %}
   "{{ httpRoutes[aMountPoint]['mountPoint'] }}": function(
     entityUrlParts, /* dict of path parts */
-    restServer=null
   ) {
     entityUrlParts['mountPoint'] = '{{ httpRoutes[aMountPoint]['mountPoint'] }}'
     var theModel = {
       entityType: '{{ httpRoutes[aMountPoint]['mountPoint'] }}',
       "{{ anAction | lower }}ServerData": function({% if anAction == "PUT" %}requestBody{% endif %}) {
-        var theUrl = buildUrl(entityUrlParts, restServer)
+        var theUrl = buildUrl(entityUrlParts)
         if (!theUrl) {
           console.log("Could not build URL for:")
-          console.log(entityUrlParts, restServer)
+          console.log(entityUrlParts)
           return
         }
         m.request({
@@ -74,7 +64,7 @@ export const connectorMixins = {
         }).then(function(result) {
           console.log("----------------------------------------------------")
           console.log("result from connectorMixins")
-          console.log(entityUrlParts, restServer)
+          console.log(entityUrlParts)
           console.log(theUrl)
           console.log(result);
           console.log("----------------------------------------------------")
