@@ -61,19 +61,24 @@ export const connectorMixins = {
           method: "{{ anAction }}",
           url: theUrl,
           {% if anAction == "PUT" %}body: requestBody,{% endif %}
-        }).then(function(result) {
+        }).then(function(response) {
           console.log("----------------------------------------------------")
-          console.log("result from connectorMixins")
+          console.log("response from connectorMixins")
           console.log(entityUrlParts)
           console.log(theUrl)
-          console.log(result);
+          console.log(response);
           console.log("----------------------------------------------------")
           try {
             {{ httpRoutes[aMountPoint].response }}_validate(result)
           } catch (err) {
             console.log(err)
           }
-          theModel.data = result
+          theModel.updateModel(
+            '{{ httpRoutes[aMountPoint]['mountPoint']}}',
+            entityUrlParts,
+            theUrl,
+            response
+          )
         })
       }
     }
