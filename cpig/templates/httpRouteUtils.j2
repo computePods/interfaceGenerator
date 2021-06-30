@@ -1,0 +1,41 @@
+// This is a collection utilities requred to handle interface http routes
+// for the {{ options['interfaceName'] }} interface.
+
+export const mountPointRouteParts = {
+  {% for aMountPoint in httpRoutes %}
+  "{{ httpRoutes[aMountPoint]['mountPoint'] }}": [{% for aPart in httpRoutes[aMountPoint]['routeParts'] %}
+    '{{ aPart }}',{% endfor %}
+  ],
+  {% endfor %}
+}
+
+export function buildUrl(
+  entityUrlParts, /* a dict/object of url parts */
+) {
+  if (!entityUrlParts.hasOwnProperty('mountPoint')) return null
+
+  var theUrlParts = []
+  theUrlParts.push(entityUrlParts['mountPoint'])
+
+  for (var aPartKey of mountPointRouteParts[entityUrlParts['mountPoint']]) {
+    if (!entityUrlParts.hasOwnProperty(aPartKey)) return null
+    if (entityUrlParts[aPartKey] == '') return null
+
+    theUrlParts.push(entityUrlParts[aPartKey])
+  }
+  return theUrlParts.join('/').replace(/\/\//g,'/')
+}
+
+export function buildArtefactPath(
+  entityUrlParts, /* a dict/object of url parts */
+) {
+  var theUrlParts = []
+
+  for (var aPartKey of mountPointRouteParts[entityUrlParts['mountPoint']]) {
+    if (!entityUrlParts.hasOwnProperty(aPartKey)) return null
+    if (entityUrlParts[aPartKey] == '') return null
+
+    theUrlParts.push(entityUrlParts[aPartKey])
+  }
+  return theUrlParts.join('/').replace(/\/\//g,'/')
+}

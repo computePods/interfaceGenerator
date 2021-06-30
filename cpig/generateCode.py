@@ -40,25 +40,6 @@ def loadTemplate(options, generationType, generationDetails) :
 
   return [ theTemplate, jinjaTemplatePath ]
 
-def getOutputPaths(options, generationType, generationDetails) :
-  distDir = options['distDir']
-
-  if 'outputPathTemplate' not in generationDetails :
-    outputPathTemplates = options['outputPathTemplates']
-    if generationType not in outputPathTemplates :
-      print("Could not determine the output path template for the {} code generator".format(generationType))
-      return [ None, None ]
-    else:
-      outputPathTemplate = outputPathTemplates[generationType]
-  else:
-    outputPathTemplate = generationDetails['outputPathTemaplate']
-
-  outputPathTemplate.insert(0, distDir)
-  outputPathTemplate = os.path.join(*outputPathTemplate)
-  outputDir = os.path.dirname(outputPathTemplate)
-
-  return [ outputDir, outputPathTemplate ]
-
 def jsonSchemaGenerator(options, interfaceDefinition) :
   if 1 < options['verbose'] :
     print("Generating json schema for {}".format(interfaceDefinition['name']))
@@ -112,6 +93,91 @@ def jsonSchemaGenerator(options, interfaceDefinition) :
       print("Yielding {} with schema \n{}".format(aRootType, yaml.dump(jsonSchema)))
     yield [aRootType, jsonSchema]
 
+def getOutputPaths(options, generationType, generationDetails) :
+  distDir = options['distDir']
+
+  if 'outputPathTemplate' not in generationDetails :
+    outputPathTemplates = options['outputPathTemplates']
+    if generationType not in outputPathTemplates :
+      print("Could not determine the output path template for the {} code generator".format(generationType))
+      return [ None, None ]
+    else:
+      outputPathTemplate = outputPathTemplates[generationType]
+  else:
+    outputPathTemplate = generationDetails['outputPathTemaplate']
+
+  outputPathTemplate.insert(0, distDir)
+  outputPathTemplate = os.path.join(*outputPathTemplate)
+  outputDir = os.path.dirname(outputPathTemplate)
+
+  return [ outputDir, outputPathTemplate ]
+
+def computeOutputFileNames(config, interfaceDefinition) :
+  interfaceName = interfaceDefinition['name']
+
+  # python (pydantic) schema file names
+  #
+  generatorOptions = copy.deepcopy(config)
+  options = generatorOptions['options']
+  if 'genSchema' in generatorOptions :
+    generatorOptions = {
+      'pydantic': generatorOptions['genSchema']['pydantic']
+    }
+
+    for generationType, generationDetails in generatorOptions.items() :
+      outputDir, outputPathTemplate = getOutputPaths(
+        options, generationType, generationDetails)
+      if outputDir is not None:
+        for aRootType, aJsonSchema in jsonSchemaGenerator(options, interfaceDefinition) :
+          outputPath = outputPathTemplate.format(aRootType)
+          config['outputFiles'][aRootType+'-rootType-py'] = os.path.basename(outputPath)
+          config['outputDirs' ][aRootType+'-rootType-py'] = outputDir
+
+  # js schema file names
+  #
+  generatorOptions = copy.deepcopy(config)
+  options = generatorOptions['options']
+  if 'genSchema' in generatorOptions :
+    generatorOptions = generatorOptions['genSchema']
+    del generatorOptions['pydantic']
+
+    for generationType, generationDetails in generatorOptions.items() :
+      outputDir, outputPathTemplate = getOutputPaths(
+        options, generationType, generationDetails)
+      if outputDir is not None:
+        for aRootType, aJsonSchema in jsonSchemaGenerator(options, interfaceDefinition) :
+          outputPath = outputPathTemplate.format(aRootType)
+          config['outputFiles'][aRootType+'-rootType-js'] = os.path.basename(outputPath)
+          config['outputDirs' ][aRootType+'-rootType-js'] = outputDir
+
+  # examples
+  #
+  generatorOptions = copy.deepcopy(config)
+  options = generatorOptions['options']
+  if 'genExamples' in generatorOptions :
+    generatorOptions = generatorOptions['genExamples']
+    for generationType, generationDetails in generatorOptions.items() :
+      outputDir, outputPathTemplate = getOutputPaths(
+        options, generationType, generationDetails)
+      if outputDir is not None:
+        outputPath = outputPathTemplate.format(interfaceName)
+        config['outputFiles'][generationType+'-examples'] = os.path.basename(outputPath)
+        config['outputDirs' ][generationType+'-examples'] = outputDir
+
+  # httpRoute output file names
+  #
+  generatorOptions = copy.deepcopy(config)
+  options = generatorOptions['options']
+  if 'genHttpRoutes' in generatorOptions :
+    generatorOptions = generatorOptions['genHttpRoutes']
+    for generationType, generationDetails in generatorOptions.items() :
+      outputDir, outputPathTemplate = getOutputPaths(
+        options, generationType, generationDetails)
+      if outputDir is not None:
+        outputPath = outputPathTemplate.format(interfaceName)
+        config['outputFiles'][generationType+'-httproutes'] = os.path.basename(outputPath)
+        config['outputDirs' ][generationType+'-httproutes'] = outputDir
+
 def pydantic(config, interfaceDefinition) :
   interfaceName = interfaceDefinition['name']
   options = config['options']
@@ -124,15 +190,13 @@ def pydantic(config, interfaceDefinition) :
   if 1 < options['verbose'] :
     print("Running pydantic schema templates on {}".format(interfaceName))
 
-  outputDir, outputPathTemplate = getOutputPaths(
-    config['options'], 'pydantic', config['genSchema']['pydantic'])
-  if outputDir is None :
-    return
-
   for aRootType, aJsonSchema in jsonSchemaGenerator(options, interfaceDefinition) :
-    outputPath = outputPathTemplate.format(aRootType)
-    config['outputFiles'][aRootType+'-rootType-py'] = os.path.basename(outputPath)
+    aRootTypeKey = aRootType+'-rootType-py'
+    if aRootTypeKey not in config['outputFiles'] :
+      continue
+    outputDir  = config['outputDirs' ][aRootTypeKey]
     os.makedirs(outputDir, exist_ok=True)
+    outputPath = os.path.join(outputDir, config['outputFiles'][aRootTypeKey])
     print("Generating pydantic {} to {}".format(aRootType, outputPath))
     print("---------------------------------------------------------")
     try:
@@ -171,15 +235,13 @@ def runSchemaTemplates(config, interfaceDefinition) :
     if theTemplate is None :
       continue
 
-    outputDir, outputPathTemplate = getOutputPaths(
-      options, generationType, generationDetails)
-    if outputDir is None :
-      continue
-
     for aRootType, aJsonSchema in jsonSchemaGenerator(options, interfaceDefinition) :
-      outputPath = outputPathTemplate.format(aRootType)
-      config['outputFiles'][aRootType+'-rootType-js'] = os.path.basename(outputPath)
+      aRootTypeKey = aRootType+'-rootType-js'
+      if aRootTypeKey not in config['outputFiles'] :
+        continue
+      outputDir  = config['outputDirs' ][aRootTypeKey]
       os.makedirs(outputDir, exist_ok=True)
+      outputPath = os.path.join(outputDir, config['outputFiles'][aRootTypeKey])
       print("Generating {} {} to {}".format(generationType, aRootType, outputPath))
       print("---------------------------------------------------------")
 
@@ -225,14 +287,12 @@ def runExampleTemplates(config, interfaceDefinition) :
     theTemplate, jinjaTemplatePath = loadTemplate(
       options, generationType, generationDetails)
 
-    outputDir, outputPathTemplate = getOutputPaths(
-      options, generationType, generationDetails)
-    if outputDir is None :
+    generationTypeKey = generationType+'-examples'
+    if generationTypeKey not in config['outputFiles'] :
       continue
-
-    outputPath = outputPathTemplate.format(interfaceName)
-    config['outputFiles'][generationType+'-examples'] = os.path.basename(outputPath)
+    outputDir  = config['outputDirs' ][generationTypeKey]
     os.makedirs(outputDir, exist_ok=True)
+    outputPath = os.path.join(outputDir, config['outputFiles'][generationTypeKey])
     print("Generating {} {} to {}".format(generationType, interfaceName, outputPath))
     print("---------------------------------------------------------")
 
@@ -284,14 +344,12 @@ def runHttpRouteTemplates(config, interfaceDefinition) :
     theTemplate, jinjaTemplatePath = loadTemplate(
       options, generationType, generationDetails)
 
-    outputDir, outputPathTemplate = getOutputPaths(
-      options, generationType, generationDetails)
-    if outputDir is None :
+    generationTypeKey = generationType+'-httproutes'
+    if generationTypeKey not in config['outputFiles'] :
       continue
-
-    outputPath = outputPathTemplate.format(interfaceName)
-    config['outputFiles'][generationType+'-httproutes'] = os.path.basename(outputPath)
+    outputDir  = config['outputDirs' ][generationTypeKey]
     os.makedirs(outputDir, exist_ok=True)
+    outputPath = os.path.join(outputDir, config['outputFiles'][generationTypeKey])
     print("Generating {} {} to {}".format(generationType, interfaceName, outputPath))
     print("---------------------------------------------------------")
 

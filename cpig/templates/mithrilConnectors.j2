@@ -10,58 +10,49 @@
 
 import m from 'mithril'
 
+import { buildUrl, buildArtefactPath } from './{{ outputFiles['httpRouteUtils-httproutes'] }}'
+
 {% for aRootType in rootTypeFiles %}
 import { {{ aRootType}}_validate } from './{{ rootTypeFiles[aRootType] }}'
 {% endfor %}
 
 function none_validate(someJson) { return true }
 
-export const mountPointRouteParts = {
-  {% for aMountPoint in httpRoutes %}
-  "{{ httpRoutes[aMountPoint]['mountPoint'] }}": [{% for aPart in httpRoutes[aMountPoint]['routeParts'] %}
-    '{{ aPart }}',{% endfor %}
-  ],
-  {% endfor %}
-}
-
-export function buildUrl(
-  entityUrlParts, /* a dict/object of url parts */
-) {
-  if (!entityUrlParts.hasOwnProperty('mountPoint')) return null
-
-  var theUrlParts = []
-  theUrlParts.push(entityUrlParts['mountPoint'])
-
-  for (var aPartKey of mountPointRouteParts[entityUrlParts['mountPoint']]) {
-    if (!entityUrlParts.hasOwnProperty(aPartKey)) return null
-    if (entityUrlParts[aPartKey] == '') return null
-
-    theUrlParts.push(entityUrlParts[aPartKey])
-  }
-  return theUrlParts.join('/').replaceAll('//','/')
-}
-
 export const connectorMixins = {
 {% for aMountPoint in httpRoutes %}
-{%   for anAction in httpRoutes[aMountPoint].actions %}
+{%   if aMountPoint != 'websocket' %}
+{%     for anAction in httpRoutes[aMountPoint].actions %}
   "{{ httpRoutes[aMountPoint]['mountPoint'] }}": function(
     entityUrlParts, /* dict of path parts */
   ) {
     entityUrlParts['mountPoint'] = '{{ httpRoutes[aMountPoint]['mountPoint'] }}'
+    var artefactPath = buildArtefactPath(entityUrlParts)
+    var theUrl       = buildUrl(entityUrlParts)
+    if (!theUrl) {
+      console.log("Could not build URL for:")
+      console.log(entityUrlParts)
+      return {
+        artefactPath: artefactPath,
+        entityType: '{{ httpRoutes[aMountPoint]['mountPoint'] }}',
+        entityUrlParts: entityUrlParts,
+      }
+    }
     var theModel = {
+      artefactPath: artefactPath,
       entityType: '{{ httpRoutes[aMountPoint]['mountPoint'] }}',
-      "{{ anAction | lower }}ServerData": function({% if anAction == "PUT" %}requestBody{% endif %}) {
-        var theUrl = buildUrl(entityUrlParts)
-        if (!theUrl) {
-          console.log("Could not build URL for:")
-          console.log(entityUrlParts)
-          return
-        }
-        m.request({
+      entityUrlParts: entityUrlParts,
+      "_{{ anAction | lower }}ServerData": function({% if anAction == "PUT" %}requestBody{% endif %}) {
+        return m.request({
           method: "{{ anAction }}",
           url: theUrl,
           {% if anAction == "PUT" %}body: requestBody,{% endif %}
-        }).then(function(response) {
+        })
+      },
+      "{{ anAction | lower }}AllServerData": function({% if anAction == "PUT" %}requestBody{% endif %}) {
+        theModel.updateRequest = null
+        theModel._{{anAction | lower }}ServerData(
+          {% if anAction == "PUT" %}requestBody{% endif %}
+        ).then(function(response) {
           console.log("----------------------------------------------------")
           console.log("response from connectorMixins")
           console.log(entityUrlParts)
@@ -69,21 +60,36 @@ export const connectorMixins = {
           console.log(response);
           console.log("----------------------------------------------------")
           try {
-            {{ httpRoutes[aMountPoint].response }}_validate(result)
+            {{ httpRoutes[aMountPoint].response }}_validate(response)
           } catch (err) {
             console.log(err)
           }
-          theModel.updateModel(
-            '{{ httpRoutes[aMountPoint]['mountPoint']}}',
-            entityUrlParts,
-            theUrl,
-            response
-          )
+          theModel.data = response
+        })
+      },
+      "{{ anAction | lower }}ChangedServerData": function({% if anAction == "PUT" %}requestBody{% endif %}) {
+        theModel.updateRequest = null
+        theModel._{{anAction | lower }}ServerData(
+          {% if anAction == "PUT" %}requestBody{% endif %}
+        ).then(function(response) {
+          console.log("----------------------------------------------------")
+          console.log("response from connectorMixins")
+          console.log(entityUrlParts)
+          console.log(theUrl)
+          console.log(response);
+          console.log("----------------------------------------------------")
+          try {
+            {{ httpRoutes[aMountPoint].response }}_validate(response)
+          } catch (err) {
+            console.log(err)
+          }
+          theModel.data = response
         })
       }
     }
     return theModel
   },
-{%   endfor %}
+{%     endfor %}
+{%   endif %}
 {% endfor %}
 }

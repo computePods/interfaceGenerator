@@ -1,0 +1,22 @@
+// This is the collection of {{ options['interfaceName'] }} NPM Express routes
+// used to implement a node.js mockServer for the Mithril Component Viewer
+
+// see: http://expressjs.com/
+//  or: https://github.com/expressjs/express
+
+import { buildUrl } from './{{ outputFiles['httpRouteUtils-httproutes'] }}'
+
+export function {{options['interfaceName']}}_handlers(app) {
+  return [
+  {% for exampleType in examples %}
+    // {{ exampleType }} handlers
+    {% for anExample in examples[exampleType] %}{%   if anExample['httpRoutes'] %}
+      // {{ anExample['title'] }}
+      app.{{anExample['httpRoutes']['action'] | lower }}(buildUrl({{ anExample['httpRoutes']['route'] }}), (req, res) => {
+        res.json({{ anExample['example'] | tojson(2) | indent("          ")}})
+      }),
+    {%   endif %}{% endfor %}
+  {% endfor %}
+  ]
+}
+

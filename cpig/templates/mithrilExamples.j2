@@ -1,0 +1,18 @@
+// This is the collection of {{ options['interfaceName'] }} mock service workers
+
+// see: https://mswjs.io/docs/getting-started/mocks/rest-api
+// see: https://mswjs.io/docs/api/setup-worker
+
+import { buildUrl        } from './{{ outputFiles['httpRouteUtils-httproutes'] }}'
+import { connectorMixins } from './{{ outputFiles['mithrilConnectors-httproutes'] }}'
+
+export const {{options['interfaceName']}}_examples = {
+{% for exampleType in examples %}
+  // {{ exampleType }} examples
+  {% for anExample in examples[exampleType] %}{%   if anExample['httpRoutes'] %}
+    "{{ anExample['title'] }}" : function() {
+      return connectorMixins['{{ anExample['httpRoutes']['route']['mountPoint']}}']({{ anExample['httpRoutes']['route'] }})
+    },
+  {%   endif %}{% endfor %}
+{% endfor %}
+}

@@ -17,8 +17,11 @@ def loadConfig(configFile, verbose) :
         'ajv'                : [ 'js',     '{}_ajv.mjs' ],
         'pythonExamples'     : [ 'python', '{}Examples.py' ],
         'javaScriptExamples' : [ 'js',     '{}Examples.mjs' ],
-        'mockServiceWorkers' : [ 'js',     '{}Msw.mjs' ],
+        'httpRouteUtils'     : [ 'js',     '{}HttpRouteUtils.mjs'],
+        'mockServerExamples' : [ 'js',     '{}MockServerExamples.mjs' ],
+        'mithrilExamples'    : [ 'js',     '{}MithrilExamples.mjs' ],
         'mithrilConnectors'  : [ 'js',     '{}MithrilConnectors.mjs'],
+        'webSocket'          : [ 'js',     '{}WebSocket.mjs'],
         'fastApiRoutes'      : [ 'python', '{}FastApiRoutes.py'],
         'fastApiExamples'    : [ 'python', '{}FastApiExamples.py']
       },
@@ -58,8 +61,16 @@ def cli(ctx, configFile, verbose, interface_name):
 
   config = loadConfig(configFile, verbose)
   config['outputFiles'] = {}
+  config['outputDirs']  = {}
 
   cpig.loadInterface.loadInterfaceFile(interface_name)
+
+  cpig.generateCode.computeOutputFileNames(
+    config,
+    cpig.loadInterface.interfaceDescription
+  )
+  #print(yaml.dump(config['outputFiles']))
+  #print(yaml.dump(config['outputDirs']))
 
   cpig.generateCode.pydantic(
     config,

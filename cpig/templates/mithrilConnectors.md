@@ -1,4 +1,4 @@
-# Mithril Connectors
+# MajorDomo UI Mithril Connectors
 
 Each [Mithril](https://mithril.js.org/) Connector is a [Mithril
 Component](https://mithril.js.org/components.html) which *models* the

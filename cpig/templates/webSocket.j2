@@ -1,0 +1,54 @@
+// The MajorDomo WebSocket interface provides a simple wrapper around the
+// standard websocket interface.
+
+// IF the webSocket object has an 'onOpen', 'onClose', 'onError' or
+// 'onMessage' function property defined *before* the 'openWebSocket'
+// method is called, then the corresponding function properties will be
+// used instead of the local defaults (which simply report the event to
+// the console log).
+
+function onOpen(evt) {
+	console.log("Websocket ({{ httpRoutes['websocket']['mountPoint'] }}) opened")
+}
+
+function onClose(evt) {
+	console.log("Websocket ({{ httpRoutes['websocket']['mountPoint'] }}) closed")
+}
+
+function onError(evt) {
+	console.log("Websocket ERROR: ")
+	console.log(evt.data)
+	console.log("Websocket error ignored")
+}
+
+function onMessage(evt) {
+	console.log("Websocket MSG:")
+	console.log(evt.data)
+	console.log("Websocket MSG ----------------------")
+}
+
+export const WebSocket = {
+  "openWebSocket": function() {
+    theWebSocket = new WebSocket('{{ httpRoutes['websocket']['mountPoint'] }}')
+    if webSocket.hasOwnProperty('onOpen') {
+    	theWebSocket.onopen = WebSocket.onOpen
+    } else {
+      theWebSocket.onopen = onOpen
+    }
+    if webSocket.hasOwnProperty('onClose') {
+    	theWebSocket.onclose = WebSocket.onClose
+    } else {
+      theWebSocket.onclose = onClose
+    }
+    if webSocket.hasOwnProperty('onError') {
+    	theWebSocket.onerror = WebSocket.onError
+    } else {
+      theWebSocket.onerror = onError
+    }
+    if webSocket.hasOwnProperty('onMessage') {
+    	theWebSocket.onmessage = WebSocket.onMessage
+    } else {
+      theWebSocket.onmessage = onMessage
+    }
+  }
+}
