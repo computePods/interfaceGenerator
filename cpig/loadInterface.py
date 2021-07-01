@@ -29,7 +29,7 @@ interfaceSchemasYaml = """
       type: draft7  # A (draft 7) JSON Schema
 
   jsonExamplesHeader:
-    # is a dictionary of jsonType -> http route fragments
+    # is a dictionary of jsonType -> HTTP route fragments
     type: object
     properties:
       title:
@@ -38,7 +38,7 @@ interfaceSchemasYaml = """
         type: object
         properties:
           # an httpRoute fragment is a object of:
-          #  - an example route (url)
+          #  - an example route (URL)
           #  - an action
           route:
             type: string
@@ -57,7 +57,7 @@ interfaceSchemasYaml = """
       #  - a list of actions (GET, POST, PUT, DELETE)
       #  - a declaration of the request/response body format
       #    as a jsonType in the jsonSchemaDefs
-      #  - the url template (which may include <name> elements)
+      #  - the URL template (which may include <name> elements)
       #
       # We follow a RESTful interface guide lines:
       # See: https://en.wikipedia.org/wiki/Representational_state_transfer#Semantics_of_HTTP_methods
@@ -68,7 +68,7 @@ interfaceSchemasYaml = """
           # the name of a jsonType in the jsonSchemaDefs
           type: string
         url:
-          # the url template for this mount point
+          # the URL template for this mount point
           type: string
         actions:
           type: array
@@ -201,7 +201,7 @@ def normalizeJsonExample(newYamlData) :
     return None
   for jsonExampleKey, jsonExampleValue in exampleHeader.items() :
     if jsonExampleKey != 'jsonExamples' :
-      print("JsonExamples MUST have the 'jsonExamles' key")
+      print("JsonExamples MUST have the 'jsonExamples' key")
       return None
     if type(jsonExampleValue) is not dict :
       print("The example in a JsonExamples MUST be a dictionary")
@@ -280,9 +280,9 @@ def addYamlBlock(yamlLines) :
     print("Error: {}".format(ex))
     print("--------------------------------------------------------------")
   if newYamlData is None :
-    return # there is no yaml data (that we could parse) in this block
+    return # there is no YAML data (that we could parse) in this block
 
-  # Check and normalize the loaded YAML data
+  # Check and normalise the loaded YAML data
   #
   if type(newYamlData[0]) is not dict :
     print("The base of a YAML block MUST be a dictionary")
@@ -315,10 +315,10 @@ def addYamlBlock(yamlLines) :
     print("--------------------------------------------------------------")
     return
 
-  # Check and merge the normalized YAML data
+  # Check and merge the normalised YAML data
   #
   if newYamlData is None :
-    return # the normalization failed....
+    return # the normalisation failed....
   #
   mergeYamlData(interfaceDescription, newYamlData, "")
 
@@ -328,7 +328,7 @@ def checkEntityInterfaceMapping() :
   #
   # AND all of the mount points MUST have been defined
   #
-  # AND all of the entityTypes MUST have been deinfed in the entityType
+  # AND all of the entityTypes MUST have been defined in the entityType
   #     definition
 
   if 'jsonExamples' not in interfaceDescription :

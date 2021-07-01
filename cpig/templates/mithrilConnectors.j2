@@ -20,8 +20,8 @@ function none_validate(someJson) { return true }
 
 export const connectorMixins = {
 {% for aMountPoint in httpRoutes %}
-{%   if aMountPoint != 'websocket' %}
-{%     for anAction in httpRoutes[aMountPoint].actions %}
+{%   for anAction in httpRoutes[aMountPoint].actions %}
+{%     if anAction != 'SSE' %}
   "{{ httpRoutes[aMountPoint]['mountPoint'] }}": function(
     entityUrlParts, /* dict of path parts */
   ) {
@@ -89,7 +89,7 @@ export const connectorMixins = {
     }
     return theModel
   },
-{%     endfor %}
-{%   endif %}
+{%     endif %}
+{%   endfor %}
 {% endfor %}
 }

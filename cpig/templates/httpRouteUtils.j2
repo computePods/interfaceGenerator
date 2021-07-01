@@ -9,6 +9,14 @@ export const mountPointRouteParts = {
   {% endfor %}
 }
 
+export const sseMountPoints = {
+  {% for aMountPoint in httpRoutes %}{% if 'SSE' in httpRoutes[aMountPoint]['actions'] %}
+  "{{ httpRoutes[aMountPoint]['mountPoint'] }}": [{% for aPart in httpRoutes[aMountPoint]['routeParts'] %}
+    '{{ aPart }}',{% endfor %}
+  ],
+  {% endif %}{% endfor %}
+}
+
 export function buildUrl(
   entityUrlParts, /* a dict/object of url parts */
 ) {

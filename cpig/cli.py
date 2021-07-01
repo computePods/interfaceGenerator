@@ -13,17 +13,16 @@ def loadConfig(configFile, verbose) :
     'options' : {
       'distDir' : 'dist',
       'outputPathTemplates' : {
-        'pydantic'           : [ 'python', '{}.py' ],
-        'ajv'                : [ 'js',     '{}_ajv.mjs' ],
-        'pythonExamples'     : [ 'python', '{}Examples.py' ],
-        'javaScriptExamples' : [ 'js',     '{}Examples.mjs' ],
-        'httpRouteUtils'     : [ 'js',     '{}HttpRouteUtils.mjs'],
-        'mockServerExamples' : [ 'js',     '{}MockServerExamples.mjs' ],
-        'mithrilExamples'    : [ 'js',     '{}MithrilExamples.mjs' ],
-        'mithrilConnectors'  : [ 'js',     '{}MithrilConnectors.mjs'],
-        'webSocket'          : [ 'js',     '{}WebSocket.mjs'],
-        'fastApiRoutes'      : [ 'python', '{}FastApiRoutes.py'],
-        'fastApiExamples'    : [ 'python', '{}FastApiExamples.py']
+        'pydantic'              : [ 'python', '{}.py' ],
+        'ajv'                   : [ 'js',     '{}_ajv.mjs' ],
+        'pythonExamples'        : [ 'python', '{}Examples.py' ],
+        'javaScriptExamples'    : [ 'js',     '{}Examples.mjs' ],
+        'httpRouteUtils'        : [ 'js',     '{}HttpRouteUtils.mjs'],
+        'mockServerExamples'    : [ 'js',     '{}MockServerExamples.mjs' ],
+        'mithrilExamples'       : [ 'js',     '{}MithrilExamples.mjs' ],
+        'mithrilConnectors'     : [ 'js',     '{}MithrilConnectors.mjs'],
+        'fastApiRoutes'         : [ 'python', '{}FastApiRoutes.py'],
+        'fastApiExamples'       : [ 'python', '{}FastApiExamples.py']
       },
     }
   }

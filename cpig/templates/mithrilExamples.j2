@@ -9,7 +9,7 @@ import { connectorMixins } from './{{ outputFiles['mithrilConnectors-httproutes'
 export const {{options['interfaceName']}}_examples = {
 {% for exampleType in examples %}
   // {{ exampleType }} examples
-  {% for anExample in examples[exampleType] %}{%   if anExample['httpRoutes'] %}
+  {% for anExample in examples[exampleType] %}{% if anExample['httpRoutes'] and anExample['httpRoutes']['action'] and anExample['httpRoutes']['action'] != 'SSE' %}
     "{{ anExample['title'] }}" : function() {
       return connectorMixins['{{ anExample['httpRoutes']['route']['mountPoint']}}']({{ anExample['httpRoutes']['route'] }})
     },

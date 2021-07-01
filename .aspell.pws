@@ -1,4 +1,4 @@
-personal_ws-1.1 en 38 
+personal_ws-1.1 en 47 
 AJV
 ComputePods
 JSON
@@ -20,9 +20,16 @@ exclusiveMaximum
 exclusiveMinimum
 fastapi
 github
+httpRoute
 httpRoutes
 https
 jreese
+jsonExample
+jsonExamples
+jsonExamplesHeader
+jsonSchemaDefs
+jsonSchemaPreamble
+jsonType
 maxContains
 maxItems
 maxLength
@@ -33,7 +40,9 @@ minLength
 minProperties
 mixin
 multipleOf
+natsChannels
 pydantic
 readOnly
 uniqueItems
+url
 writeOnly
