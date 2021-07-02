@@ -9,6 +9,7 @@
 // when it create the mixin.
 
 import m from 'mithril'
+import log from 'loglevel'
 
 import { buildUrl, buildArtefactPath } from './{{ outputFiles['httpRouteUtils-httproutes'] }}'
 
@@ -29,8 +30,8 @@ export const connectorMixins = {
     var artefactPath = buildArtefactPath(entityUrlParts)
     var theUrl       = buildUrl(entityUrlParts)
     if (!theUrl) {
-      console.log("Could not build URL for:")
-      console.log(entityUrlParts)
+      log.error("Could not build URL for:")
+      log.error(entityUrlParts)
       return {
         artefactPath: artefactPath,
         entityType: '{{ httpRoutes[aMountPoint]['mountPoint'] }}',
@@ -53,16 +54,16 @@ export const connectorMixins = {
         theModel._{{anAction | lower }}ServerData(
           {% if anAction == "PUT" %}requestBody{% endif %}
         ).then(function(response) {
-          console.log("----------------------------------------------------")
-          console.log("response from connectorMixins")
-          console.log(entityUrlParts)
-          console.log(theUrl)
-          console.log(response);
-          console.log("----------------------------------------------------")
+          log.debug("----------------------------------------------------")
+          log.debug("response from connectorMixins")
+          log.debug(entityUrlParts)
+          log.debug(theUrl)
+          log.debug(response);
+          log.debug("----------------------------------------------------")
           try {
             {{ httpRoutes[aMountPoint].response }}_validate(response)
           } catch (err) {
-            console.log(err)
+            log.error(err)
           }
           theModel.data = response
         })
@@ -72,16 +73,16 @@ export const connectorMixins = {
         theModel._{{anAction | lower }}ServerData(
           {% if anAction == "PUT" %}requestBody{% endif %}
         ).then(function(response) {
-          console.log("----------------------------------------------------")
-          console.log("response from connectorMixins")
-          console.log(entityUrlParts)
-          console.log(theUrl)
-          console.log(response);
-          console.log("----------------------------------------------------")
+          log.debug("----------------------------------------------------")
+          log.debug("response from connectorMixins")
+          log.debug(entityUrlParts)
+          log.debug(theUrl)
+          log.debug(response);
+          log.debug("----------------------------------------------------")
           try {
             {{ httpRoutes[aMountPoint].response }}_validate(response)
           } catch (err) {
-            console.log(err)
+            log.error(err)
           }
           theModel.data = response
         })
