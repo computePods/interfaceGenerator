@@ -1,0 +1,30 @@
+[project]
+name = "interfaceGenerator"
+version = "0.0.1"
+description = "A simple Python tool to generate computer readable Python and JavaScript interfaces from Markdown/YAML descriptions."
+authors = [
+    {name = "Stephen Gaito", email = "stephen@perceptisys.co.uk"},
+]
+dependencies = [
+    "click~=8.0",
+    "jinja2~=3.0",
+    "pyyaml~=5.4",
+    "datamodel-code-generator~=0.0",
+]
+requires-python = ">=3.8"
+dynamic = ["classifiers"]
+license = {text = "Apache-2.0"}
+
+[project.urls]
+homepage = "https://github.com/computePods/interfaceGenerator"
+
+[project.scripts]
+cpig = "cpig:cli"
+
+[build-system]
+requires = ["pdm-pep517"]
+build-backend = "pdm.pep517.api"
+
+[tool]
+[tool.pdm]
+
