@@ -34,10 +34,10 @@ def add{{ options['interfaceName'] }}Examples(appSelf) :
   {% for anExample in examples[exampleType] %}{%   if anExample.httpRoutes %}
   # {{ anExample.title }}
   @appSelf.{{ anExample.httpRoutes.action | lower }}(buildUrl(
-    {{ anExample.httpRoutes.route | tojson(2) | indent("     ") }}
+    {{ anExample.httpRoutes.route | tojson(2) | indent(width=5) }}
   ))
   def {{ exampleType }}_{{ loop.index }}() :
-    return {{ anExample.example | tojson(2) | indent("    ")}}
+    return {{ anExample.example | tojson(2) | indent(width=4)}}
 
   {% endif %}{% endfor %}
   {% endfor %}

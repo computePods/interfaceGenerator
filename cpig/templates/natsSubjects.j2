@@ -1,0 +1,37 @@
+# This is a collection of Python decorators for the
+# {{ options['interfaceName'] }} interface.
+
+def add{{ options['interfaceName'] }}NatsSubjects(appSelf) :
+
+{% for aNatsSubject in natsSubjects %}
+
+  def subscribe_{{ natsSubjects[aNatsSubject].baseSubject | replace('.','_') }}({{ natsSubjects[aNatsSubject].subjectParts | join('=None, ') }}=None):
+    wildCards = ""
+{%   if natsSubjects[aNatsSubject].subjectParts %}
+{%     for aSubjectPart in natsSubjects[aNatsSubject].subjectParts %}
+    if {{ aSubjectPart }} :
+      wildCards = wildCards + '.' + {{ aSubjectPart }}
+    else :
+      wildCards = wildCards + '.{{ natsSubjects[aNatsSubject].subjectWildcards[aSubjectPart] }}'
+{%     endfor %}
+{%   endif %}
+    def decoratorSubscribe(implFunc):
+      return appSelf.subscribe(
+        '{{ natsSubjects[aNatsSubject].baseSubject }}'+wildCards,
+        cb=implFunc
+      )
+    return decoratorSubscribe
+
+  appSelf.subscribe_{{ natsSubjects[aNatsSubject].baseSubject | replace('.','_') }} = subscribe_{{ natsSubjects[aNatsSubject].baseSubject | replace('.','_') }}
+
+  """
+  Example use:
+
+    @subscribe_{{ natsSubjects[aNatsSubject].baseSubject | replace('.','_') }}
+    async def subscribe_{{ natsSubjects[aNatsSubject].baseSubject | replace('.','_') }}_impl({{ natsSubjects[aNatsSubject].subjectParts | join(', ') }}) :
+      {{ natsSubjects[aNatsSubject].message }} = { .... }
+      # do something and then return {{ natsSubjects[aNatsSubject].message }} ...
+      return {{ natsSubjects[aNatsSubject].message }}
+  """
+
+{% endfor %}

@@ -1,7 +1,3 @@
-
-# For file inclusion consider:
-#   https://github.com/jreese/markdown-pp
-
 import copy
 import json
 import jsonschema
@@ -79,8 +75,8 @@ interfaceSchemasYaml = """
               - PUT
               - DELETE
 
-  natsChannels: { }
-    # is a dictionary of NATS channels -> ????
+  natsSubjects: { }
+    # is a dictionary of NATS subjects -> ????
 """
 
 def validateJsonData(jsonData, aSchemaName) :
@@ -167,6 +163,41 @@ def normalizeHttpRoutes(someHttpRoutes) :
       mpDetails['mountPoint'] = mountPoint
       mpDetails['routeParts'] = routeParts
 
+def normalizeNatsSubjects(someNatsSubjects) :
+  #
+  # We expand the subject into its constituent parts
+  #
+  if type(someNatsSubjects) is not dict :
+    return
+
+  if 'natsSubjects' not in someNatsSubjects :
+    return
+  natsSubjects = someNatsSubjects['natsSubjects']
+  print("===============================================+++")
+  print(yaml.dump(natsSubjects))
+  print("===============================================+++")
+  for subjectName, subjectDetails in someNatsSubjects['natsSubjects'].items() :
+    if 'subject' in subjectDetails :
+      subjectFields = subjectDetails['subject'].split('.')
+      baseSubject = ""
+      subjectParts = []
+      subjectWildcards = {}
+      i = 0
+      while i < len(subjectFields) and not subjectFields[i].startswith( ('<', '[') ) :
+        if subjectFields[i] != '' :
+          baseSubject = baseSubject+'.'+subjectFields[i]
+        i = i + 1
+      while i < len(subjectFields) :
+        if subjectFields[i].startswith('[') :
+          subjectWildcards[subjectFields[i].strip('<[]>')] = ('>')
+        else :
+          subjectWildcards[subjectFields[i].strip('<[]>')] = ('*')
+        subjectParts.append(subjectFields[i].strip('<[]>'))
+        i = i + 1
+      subjectDetails['baseSubject']      = baseSubject.strip('.')
+      subjectDetails['subjectParts']     = subjectParts
+      subjectDetails['subjectWildcards'] = subjectWildcards
+
 def loadInterfaceSchemas() :
   global interfaceSchemas
   if interfaceSchemas is None :
@@ -218,10 +249,10 @@ def normalizeJsonExample(newYamlData) :
         return None
       if 'httpRoutes' in exampleValue :
         pass
-      elif 'natsChannels' in exampleValue :
+      elif 'natsSubjects' in exampleValue :
         pass
       else :
-        print("The example in a jsonExamples MUST have either an httpRoutes or natsChannel")
+        print("The example in a jsonExamples MUST have either an httpRoutes or natsSubject")
         return None
       exampleValue['example'] = exampleBody
       return { 'jsonExamples':
@@ -279,9 +310,8 @@ def addYamlBlock(yamlLines) :
     print("--------------------------------------------------------------")
     print("Error: {}".format(ex))
     print("--------------------------------------------------------------")
-  if newYamlData is None :
+  if not newYamlData :
     return # there is no YAML data (that we could parse) in this block
-
   # Check and normalise the loaded YAML data
   #
   if type(newYamlData[0]) is not dict :
@@ -302,14 +332,15 @@ def addYamlBlock(yamlLines) :
     newYamlData = newYamlData[0]
     validateJsonData(newYamlData, 'httpRoutes')
     normalizeHttpRoutes(newYamlData)
-  elif 'natsChannels' in newYamlData :
+  elif 'natsSubjects' in newYamlData[0] :
     newYamlData = newYamlData[0]
-    validateJsonData(newYamlData, 'natsChannels')
+    normalizeNatsSubjects(newYamlData)
+    validateJsonData(newYamlData, 'natsSubjects')
   elif 'jsonSchemaPreambles' in newYamlData[0] :
     newYamlData = newYamlData[0]
     validateJsonData(newYamlData, 'jsonSchemaPreambles')
   else :
-    print("The YAML block must contain a 'jsonSchemaPreambles', 'jsonSchemaDefs', 'jsonExamples', 'httpRoutes' or 'natsChannel' definition.")
+    print("The YAML block must contain a 'jsonSchemaPreambles', 'jsonSchemaDefs', 'jsonExamples', 'httpRoutes' or 'natsSubjects' definition.")
     print("--------------------------------------------------------------")
     print("\n  ".join(yamlLines))
     print("--------------------------------------------------------------")

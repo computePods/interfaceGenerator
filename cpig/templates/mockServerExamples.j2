@@ -14,7 +14,7 @@ export function {{options['interfaceName']}}_handlers(app) {
       // {{ anExample['title'] }}
       app.{{anExample['httpRoutes']['action'] | lower }}(buildUrl({{ anExample['httpRoutes']['route'] }}), (req, res) => {
         console.log("Serving mockServer example: ["+buildUrl({{ anExample['httpRoutes']['route'] }})+"]")
-        res.json({{ anExample['example'] | tojson(2) | indent("          ")}})
+        res.json({{ anExample['example'] | tojson(2) | indent(width=10)}})
       }),
     {%   endif %}{% endfor %}
   {% endfor %}

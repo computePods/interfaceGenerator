@@ -141,14 +141,15 @@ def computeOutputFileNames(config, interfaceDefinition) :
     generatorOptions = generatorOptions['genSchema']
     del generatorOptions['pydantic']
 
-    for generationType, generationDetails in generatorOptions.items() :
-      outputDir, outputPathTemplate = getOutputPaths(
-        options, generationType, generationDetails)
-      if outputDir is not None:
-        for aRootType, aJsonSchema in jsonSchemaGenerator(options, interfaceDefinition) :
-          outputPath = outputPathTemplate.format(aRootType)
-          config['outputFiles'][aRootType+'-rootType-js'] = os.path.basename(outputPath)
-          config['outputDirs' ][aRootType+'-rootType-js'] = outputDir
+    if generatorOptions :
+      for generationType, generationDetails in generatorOptions.items() :
+        outputDir, outputPathTemplate = getOutputPaths(
+          options, generationType, generationDetails)
+        if outputDir is not None:
+          for aRootType, aJsonSchema in jsonSchemaGenerator(options, interfaceDefinition) :
+            outputPath = outputPathTemplate.format(aRootType)
+            config['outputFiles'][aRootType+'-rootType-js'] = os.path.basename(outputPath)
+            config['outputDirs' ][aRootType+'-rootType-js'] = outputDir
 
   # examples
   #
@@ -156,13 +157,14 @@ def computeOutputFileNames(config, interfaceDefinition) :
   options = generatorOptions['options']
   if 'genExamples' in generatorOptions :
     generatorOptions = generatorOptions['genExamples']
-    for generationType, generationDetails in generatorOptions.items() :
-      outputDir, outputPathTemplate = getOutputPaths(
-        options, generationType, generationDetails)
-      if outputDir is not None:
-        outputPath = outputPathTemplate.format(interfaceName)
-        config['outputFiles'][generationType+'-examples'] = os.path.basename(outputPath)
-        config['outputDirs' ][generationType+'-examples'] = outputDir
+    if generatorOptions :
+      for generationType, generationDetails in generatorOptions.items() :
+        outputDir, outputPathTemplate = getOutputPaths(
+          options, generationType, generationDetails)
+        if outputDir is not None:
+          outputPath = outputPathTemplate.format(interfaceName)
+          config['outputFiles'][generationType+'-examples'] = os.path.basename(outputPath)
+          config['outputDirs' ][generationType+'-examples'] = outputDir
 
   # httpRoute output file names
   #
@@ -170,13 +172,29 @@ def computeOutputFileNames(config, interfaceDefinition) :
   options = generatorOptions['options']
   if 'genHttpRoutes' in generatorOptions :
     generatorOptions = generatorOptions['genHttpRoutes']
-    for generationType, generationDetails in generatorOptions.items() :
-      outputDir, outputPathTemplate = getOutputPaths(
-        options, generationType, generationDetails)
-      if outputDir is not None:
-        outputPath = outputPathTemplate.format(interfaceName)
-        config['outputFiles'][generationType+'-httproutes'] = os.path.basename(outputPath)
-        config['outputDirs' ][generationType+'-httproutes'] = outputDir
+    if generatorOptions :
+      for generationType, generationDetails in generatorOptions.items() :
+        outputDir, outputPathTemplate = getOutputPaths(
+          options, generationType, generationDetails)
+        if outputDir is not None:
+          outputPath = outputPathTemplate.format(interfaceName)
+          config['outputFiles'][generationType+'-httproutes'] = os.path.basename(outputPath)
+          config['outputDirs' ][generationType+'-httproutes'] = outputDir
+
+  # natsSubjects output file names
+  #
+  generatorOptions = copy.deepcopy(config)
+  options = generatorOptions['options']
+  if 'genNatsSubjects' in generatorOptions :
+    generatorOptions = generatorOptions['genNatsSubjects']
+    if generatorOptions :
+      for generationType, generationDetails in generatorOptions.items() :
+        outputDir, outputPathTemplate = getOutputPaths(
+          options, generationType, generationDetails)
+        if outputDir is not None:
+          outputPath = outputPathTemplate.format(interfaceName)
+          config['outputFiles'][generationType+'-natsSubjects'] = os.path.basename(outputPath)
+          config['outputDirs' ][generationType+'-natsSubjects'] = outputDir
 
 def pydantic(config, interfaceDefinition) :
   interfaceName = interfaceDefinition['name']
@@ -258,6 +276,9 @@ def runSchemaTemplates(config, interfaceDefinition) :
       except Exception as ex :
         print("Could not render the Jinja2 template [{}] using the {} JSON Schema".format(jinjaTemplatePath, aRootType ))
         print(ex)
+        print("---------------------------------------------------------------")
+        print(yaml.dump(aJsonSchema))
+        print("---------------------------------------------------------------")
 
 spaceTranslator = str.maketrans(' ', '_')
 
@@ -282,6 +303,8 @@ def runExampleTemplates(config, interfaceDefinition) :
     return
   generatorOptions = generatorOptions['genExamples']
 
+  if not generatorOptions :
+    return
   for generationType, generationDetails in generatorOptions.items() :
 
     theTemplate, jinjaTemplatePath = loadTemplate(
@@ -307,17 +330,24 @@ def runExampleTemplates(config, interfaceDefinition) :
 
     generationDetails['interfaceName'] = interfaceName
     try :
-      renderedStr = theTemplate.render({
-        'options'     : generationDetails,
-        'outputFiles' : config['outputFiles'],
-        'examples'    : jsonExamples,
-        'httpRoutes'  : httpRoutes,
-      })
+      templateOptions = {
+              'options'     : generationDetails,
+              'outputFiles' : config['outputFiles'],
+              'examples'    : jsonExamples,
+              'httpRoutes'  : httpRoutes,
+            }
+      #print(yaml.dump(templateOptions))
+      renderedStr = theTemplate.render(templateOptions)
       with open(outputPath, 'w') as outFile :
         outFile.write(renderedStr)
     except Exception as ex :
       print("Could not render the Jinja2 template [{}] using the {} jsonExamples".format(jinjaTemplatePath, interfaceName ))
       print(ex)
+      print("---------------------------------------------------------------")
+      print(yaml.dump(jsonExamples))
+      print("---------------------")
+      print(yaml.dump(httpRoutes))
+      print("---------------------------------------------------------------")
 
 def runHttpRouteTemplates(config, interfaceDefinition) :
   interfaceName = interfaceDefinition['name']
@@ -339,6 +369,8 @@ def runHttpRouteTemplates(config, interfaceDefinition) :
     return
   generatorOptions = generatorOptions['genHttpRoutes']
 
+  if not generatorOptions :
+    return
   for generationType, generationDetails in generatorOptions.items() :
 
     theTemplate, jinjaTemplatePath = loadTemplate(
@@ -374,3 +406,76 @@ def runHttpRouteTemplates(config, interfaceDefinition) :
     except Exception as ex :
       print("Could not render the Jinja2 template [{}] using the {} httpRoutes".format(jinjaTemplatePath, interfaceName ))
       print(ex)
+      print("---------------------------------------------------------------")
+      print(yaml.dump(rootTypeFiles))
+      print("---------------------")
+      print(yaml.dump(httpRoutes))
+      print("---------------------")
+      print(yaml.dump(jsonSchemaDefs))
+      print("---------------------------------------------------------------")
+
+def runNatsSubjectsTemplates(config, interfaceDefinition) :
+  interfaceName = interfaceDefinition['name']
+
+  if 'natsSubjects' not in interfaceDefinition :
+    return
+  natsSubjects = interfaceDefinition['natsSubjects']
+
+  if 'jsonSchemaDefs' not in interfaceDefinition :
+    return
+  jsonSchemaDefs = interfaceDefinition['jsonSchemaDefs']
+
+  #
+  # setup the collection of generators for our use...
+  #
+  generatorOptions = copy.deepcopy(config)
+  options = generatorOptions['options']
+  if 'genNatsSubjects' not in generatorOptions :
+    return
+  generatorOptions = generatorOptions['genNatsSubjects']
+
+  if not generatorOptions :
+    return
+  for generationType, generationDetails in generatorOptions.items() :
+
+    theTemplate, jinjaTemplatePath = loadTemplate(
+      options, generationType, generationDetails)
+
+    generationTypeKey = generationType+'-natsSubjects'
+    if generationTypeKey not in config['outputFiles'] :
+      continue
+    outputDir  = config['outputDirs' ][generationTypeKey]
+    os.makedirs(outputDir, exist_ok=True)
+    outputPath = os.path.join(outputDir, config['outputFiles'][generationTypeKey])
+    print("Generating {} {} to {}".format(generationType, interfaceName, outputPath))
+    print("---------------------------------------------------------")
+
+    rootTypeFiles = {}
+    for anOutputKey, anOutputFile in config['outputFiles'].items() :
+      if anOutputKey.endswith('-rootType-js') :
+        rootTypeFiles[anOutputKey.split('-')[0]] = anOutputFile
+
+    generationDetails['interfaceName'] = interfaceName
+    try :
+      #print(yaml.dump(config['outputFiles']))
+      #print(yaml.dump(rootTypeFiles))
+      print(yaml.dump(natsSubjects))
+      renderedStr = theTemplate.render({
+        'options'        : generationDetails,
+        'outputFiles'    : config['outputFiles'],
+        'rootTypeFiles'  : rootTypeFiles,
+        'natsSubjects'   : natsSubjects,
+        'jsonSchemaDefs' : jsonSchemaDefs,
+      })
+      with open(outputPath, 'w') as outFile :
+        outFile.write(renderedStr)
+    except Exception as ex :
+      print("Could not render the Jinja2 template [{}] using the {} natsSubjects".format(jinjaTemplatePath, interfaceName ))
+      print(ex)
+      print("---------------------------------------------------------------")
+      print(yaml.dump(rootTypeFiles))
+      print("---------------------")
+      print(yaml.dump(natsSubjects))
+      print("---------------------")
+      print(yaml.dump(jsonSchemaDefs))
+      print("---------------------------------------------------------------")

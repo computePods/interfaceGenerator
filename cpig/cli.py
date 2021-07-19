@@ -22,7 +22,8 @@ def loadConfig(configFile, verbose) :
         'mithrilExamples'       : [ 'js',     '{}MithrilExamples.mjs' ],
         'mithrilConnectors'     : [ 'js',     '{}MithrilConnectors.mjs'],
         'fastApiRoutes'         : [ 'python', '{}FastApiRoutes.py'],
-        'fastApiExamples'       : [ 'python', '{}FastApiExamples.py']
+        'fastApiExamples'       : [ 'python', '{}FastApiExamples.py'],
+        'natsSubjects'          : [ 'python', '{}NatsSubjects.py']
       },
     }
   }
@@ -85,6 +86,11 @@ def cli(ctx, configFile, verbose, interface_name):
   # these files.
 
   cpig.generateCode.runHttpRouteTemplates(
+    config,
+    cpig.loadInterface.interfaceDescription
+  )
+
+  cpig.generateCode.runNatsSubjectsTemplates(
     config,
     cpig.loadInterface.interfaceDescription
   )
