@@ -1,0 +1,17 @@
+site_name: ComputePods InterfaceGenerator
+
+site_url: https://computepods.github.io/interfaceGenerator/
+
+repo_url: https://github.com/computePods/interfaceGenerator
+
+plugins:
+  - search
+  - compute-pods
+  - awesome-pages
+  - mkdocstrings:
+      watch:
+        - cpig
+        - tests
+
+theme:
+  name: material
