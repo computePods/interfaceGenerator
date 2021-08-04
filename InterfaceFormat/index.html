@@ -1,0 +1,641 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="canonical" href="https://computepods.github.io/interfaceGenerator/InterfaceFormat/">
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.2.2, mkdocs-material-7.1.11">
+    
+    
+      
+        <title>ComputePods interface format - ComputePods InterfaceGenerator</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.3754935a.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.f1a3b89f.min.css">
+        
+      
+    
+    
+    
+      
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,400i,700%7CRoboto+Mono&display=fallback">
+        <style>:root{--md-text-font-family:"Roboto";--md-code-font-family:"Roboto Mono"}</style>
+      
+    
+    
+    
+      <link rel="stylesheet" href="../assets/_mkdocstrings.css">
+    
+    
+      
+
+
+    
+    
+  </head>
+  
+  
+    
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="" data-md-color-primary="none" data-md-color-accent="none">
+  
+    
+    <script>function __prefix(e){return new URL("..",location).pathname+"."+e}function __get(e,t=localStorage){return JSON.parse(t.getItem(__prefix(e)))}</script>
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#computepods-interface-format" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="/" title="ComputePods InterfaceGenerator" class="md-header__button md-logo" aria-label="ComputePods InterfaceGenerator" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            ComputePods InterfaceGenerator
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              ComputePods interface format
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+      </label>
+      
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" data-md-state="active" required>
+      <label class="md-search__icon md-icon" for="__search">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+      </label>
+      <button type="reset" class="md-search__icon md-icon" aria-label="Clear" tabindex="-1">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z"/></svg>
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        
+<a href="https://github.com/computePods/interfaceGenerator/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="/" title="ComputePods InterfaceGenerator" class="md-nav__button md-logo" aria-label="ComputePods InterfaceGenerator" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54z"/></svg>
+
+    </a>
+    ComputePods InterfaceGenerator
+  </label>
+  
+    <div class="md-nav__source">
+      
+<a href="https://github.com/computePods/interfaceGenerator/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        ComputePods interface generator design
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Config/" class="md-nav__link">
+        ComputePods interface generator configuration
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../Generation/" class="md-nav__link">
+        ComputePods interface generation design
+      </a>
+    </li>
+  
+
+    
+      
+      
+      
+
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          ComputePods interface format
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        ComputePods interface format
+      </a>
+      
+        
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#yamlized-json-schema-format" class="md-nav__link">
+    YAMLized JSON schema format
+  </a>
+  
+    <nav class="md-nav" aria-label="YAMLized JSON schema format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#json-schema-resources" class="md-nav__link">
+    JSON schema resources
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#json-schema-keywords" class="md-nav__link">
+    JSON schema keywords
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#yamlized-json-schema-format" class="md-nav__link">
+    YAMLized JSON schema format
+  </a>
+  
+    <nav class="md-nav" aria-label="YAMLized JSON schema format">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#json-schema-resources" class="md-nav__link">
+    JSON schema resources
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#json-schema-keywords" class="md-nav__link">
+    JSON schema keywords
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          <div class="md-content" data-md-component="content">
+            <article class="md-content__inner md-typeset">
+              
+                
+                  <a href="https://github.com/computePods/interfaceGenerator/edit/master/docs/InterfaceFormat.md" title="Edit this page" class="md-content__button md-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20.71 7.04c.39-.39.39-1.04 0-1.41l-2.34-2.34c-.37-.39-1.02-.39-1.41 0l-1.84 1.83 3.75 3.75M3 17.25V21h3.75L17.81 9.93l-3.75-3.75L3 17.25z"/></svg>
+                  </a>
+                
+                
+                <h1 id="computepods-interface-format">ComputePods interface format</h1>
+<!-- toc -->
+
+<p>The interface format consists of a 
+<a href="https://en.wikipedia.org/wiki/Markdown">Markdown</a> file with embedded
+<a href="https://en.wikipedia.org/wiki/YAML">YAML</a> code blocks. </p>
+<p>The Markdown structure of the overall description provides the developers 
+with a human readable <em>description</em> of each interface. </p>
+<p>The embedded YAML code blocks describe sections of the overall interface 
+in a precise <em>machine readable format</em> which is not too difficult for a 
+human developer to read and understand. </p>
+<p>The outer level of the YAML for an interface consists of a dictionary 
+containing five keys: </p>
+<ol>
+<li><strong><code>jsonSchemaPreamble</code></strong> The (optional) <code>jsonSchemaPreamble</code> is a 
+   dictionary of the JSON Schema preambles for each of the root classes 
+   to be built. The keys in the dictionary associated with each root class 
+   consist of the JSON schema preamble definitions for that root class's 
+   whole schema. </li>
+</ol>
+<p>The YAMLized schema for <code>jsonSchemaPreamble</code> is as follows:</p>
+<p><code>yaml
+     jsonSchemaPreamble:
+       # is a dictionary of jsonType -&gt; JSON Schema preamble strings
+       type: dictionary
+       items:
+         type: dictionary
+         items:
+           type: string</code></p>
+<ol>
+<li><strong><code>jsonSchemaDefs</code></strong> The <code>jsonSchemaDefs</code> is a  dictionary of 
+   individual JSON types defined using a YAMLized JSON schema format (<a href="#yamlized-json-schema-format">see 
+   below</a>) </li>
+</ol>
+<p>The YAMLized schema for <code>jsonSchemaDefs</code> is as follows:</p>
+<p><code>yaml
+     jsonSchemaDefs:
+       # is a dictionary of jsonType -&gt; JSON Schema definitions
+       type: dictionary
+       items: 
+         type: draft7  # A (draft 7) JSON Schema</code></p>
+<ol>
+<li><strong><code>jsonExamples</code></strong> The <code>jsonExamples</code> is a  dictionary containing 
+   arrays of JSON examples for each major JSON type. These examples can be 
+   used in automated testing of the interfaced components. </li>
+</ol>
+<p>The YAMLized schema for the <em>header</em> of one <code>jsonExamples</code> is as 
+   follows: </p>
+<p><code>yaml
+     jsonExamplesHeader:
+       # is a dictionary of jsonType -&gt; http route fragments
+       type: object
+       properties:
+         title:
+           type: string
+         httpRoutes:
+           type: object
+           properties:
+             # an httpRoute fragment is a object of:
+             #  - an example route (url)
+             #  - an action
+             route:
+               type: string
+             action:
+               enum:
+                - GET
+                - POST
+                - PUT
+                - DELETE</code></p>
+<ol>
+<li><strong><code>httpRoutes</code></strong> The <code>httpRoutes</code> is a dictionary of server HTTP mount 
+   points. Associated with each mount point is a JSON object with the 
+   properties <code>body</code> (which is the <em>name</em> of a <code>jsonType</code> in the 
+   <code>jsonSchemaDefs</code>), <code>url</code> (a string URL template for the mount point), 
+   <code>actions</code> (an array of <code>GET</code>, <code>POST</code>, <code>PUT</code> and <code>DELETE</code> HTTP actions). 
+   The <code>body</code> <code>jsonType</code> is expected JSON payload and response (if any). 
+   Each JSON type MUST be described in the <code>jsonSchemaDefs</code> dictionary. </li>
+</ol>
+<p><strong>Question</strong>: Since the HTTP route orders tend to be significant, 
+   should this be an ordered array (or can we simply order the keys)?</p>
+<p><strong>Answer</strong>: We will use a  dictionary for the collection of routes, 
+   but each route will have a numeric "priority" field. The collection of 
+   routes will be sorted by priority and then the route (as a string). </p>
+<p>The YAMLized schema for <code>httpRoutes</code> is as follows:</p>
+<pre><code>```yaml 
+ httpRoutes:
+   # is a dictionary of mountPoints -&gt; httpRoutes 
+   type: dictionary
+   items:
+     # an httpRoute is a dictionary of:
+     #  - a list of actions (GET, POST, PUT, DELETE)
+     #  - a declaration of the request/response body format 
+     #    as a jsonType in the jsonSchemaDefs
+     #  - the url template (which may include &lt;name&gt; elements)
+     #
+     # We follow a RESTful interface guide lines:
+     # See: https://en.wikipedia.org/wiki/Representational_state_transfer#Semantics_of_HTTP_methods
+     #
+     type: object
+     properties:
+       body:
+         # the name of a jsonType in the jsonSchemaDefs
+         type: string 
+       url:
+         # the url template for this mount point
+         type: string 
+       actions:
+         type: array
+         items:
+           enum:
+             - GET
+             - POST
+             - PUT
+             - DELETE
+</code></pre>
+<p>```</p>
+<ol>
+<li><strong><code>natsChannels</code></strong> The <code>natsChannels</code> is a dictionary of NATS channels. 
+   Each channel is a dictionary describing the channel and the type of its 
+   expected JSON payloads and responses (if any). Each JSON type MUST be 
+   described in the <code>jsonSchemaDefs</code> dictionary. </li>
+</ol>
+<p>The YAMLized schema for <code>natsChannels</code> is as follows:</p>
+<p><code>yaml
+     natsChannels: { }
+       # is a dictionary of NATS channels -&gt; ????</code></p>
+<p>The parsing and validation of the JSON payloads will be done using 
+<a href="https://ajv.js.org/">AJV</a> (for JavaScript) and 
+<a href="https://github.com/koxudaxi/datamodel-code-generator">datamodel-code-generator</a> +
+<a href="https://pydantic-docs.helpmanual.io/">pydantic</a> (for Python). </p>
+<h2 id="yamlized-json-schema-format">YAMLized JSON schema format</h2>
+<p>The YAMLized description of each JSON type is essentially that fragment 
+of the full <a href="http://json-schema.org/">JSON schema</a> which is needed to 
+define <em>one</em> JSON type. Once processed by the interface generator, the 
+combination of the <code>jsonSchemaPreamble</code> and the <code>jsonSchemaDefs</code> is a JSON 
+schema format sufficient for the use with both 
+<a href="https://ajv.js.org/json-schema.html">AJV</a> and 
+<a href="https://koxudaxi.github.io/datamodel-code-generator/">datamodel-code-generator</a>. </p>
+<p>Once processed into valid JSON schema, the <code>jsonSchemaDefs</code> definitions 
+are placed into a standard JSON schema <code>$defs</code> dictionary. This means the 
+cross references to types defined in this interface schema, can be done 
+using the standard (internal) reference notation: </p>
+<pre><code>  $ref: &quot;#/$defs/&lt;nameOfJsonType&gt;&quot;
+</code></pre>
+<p>To help express the overall semantic meaning of the <code>jsonSchemaDefs</code> we 
+add a <code>dictionary</code> type to the "valid" schema. This <code>dictionary</code> type must 
+have an associated <code>items</code> key. This <code>dictionary</code> type is then transformed 
+into valid JSON schema as suggested by the StackOverflow <a href="https://stackoverflow.com/questions/27357861/dictionary-like-json-schema">Dictionary-like 
+JSON 
+schema</a> 
+question. </p>
+<h3 id="json-schema-resources">JSON schema resources</h3>
+<p>The <a href="http://json-schema.org">JSON schema</a> site itself has a number of very 
+accessible <a href="http://json-schema.org/learn/">introductions</a> to its schema. </p>
+<p>Of particular use to us is the <a href="http://json-schema.org/understanding-json-schema/structuring.html">Structuring a complex 
+schema</a>
+chapter which is part of the larger <a href="http://json-schema.org/understanding-json-schema/index.html">Understanding JSON 
+Schema</a> book.</p>
+<p>In addition there are the
+<a href="http://json-schema.org/draft/2020-12/json-schema-core.html">JSON Schema Core</a>,
+<a href="http://json-schema.org/draft/2020-12/json-schema-validation.html">JSON Schema Validation</a> and
+<a href="http://json-schema.org/draft/2020-12/relative-json-pointer.html">Relative JSON Pointers</a>
+specifications. </p>
+<h3 id="json-schema-keywords">JSON schema keywords</h3>
+<p>The following is a list of the JSON schema keywords which the interface 
+generator tool recognises (there may be other keywords defined by the JSON 
+schema specification which we do not have need to use).</p>
+<ul>
+<li>
+<p><strong>preamble keywords</strong>: $id, $schema, $vocabulary,</p>
+</li>
+<li>
+<p><strong>annotation keywords</strong>: description, title, deprecated, readOnly, 
+  writeOnly, examples </p>
+</li>
+<li>
+<p><strong>assertion keywords</strong>: type, enum, const, multipleOf, maximum, 
+  exclusiveMaximum, minimum, exclusiveMinimum, maxLength, minLength, 
+  pattern, maxItems, minItems, uniqueItems, maxContains, minContains, 
+  maxProperties, minProperties, required, dependentRequired </p>
+</li>
+<li>
+<p><strong>applicator keywords</strong>: $ref</p>
+</li>
+</ul>
+<p>Note that this list and categorisation is <em>not</em> definitive.</p>
+                
+              
+              
+                
+
+
+              
+            </article>
+          </div>
+        </div>
+        
+      </main>
+      
+        
+<footer class="md-footer">
+  
+    <nav class="md-footer__inner md-grid" aria-label="Footer">
+      
+        
+        <a href="../Generation/" class="md-footer__link md-footer__link--prev" aria-label="Previous: ComputePods interface generation design" rel="prev">
+          <div class="md-footer__button md-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12z"/></svg>
+          </div>
+          <div class="md-footer__title">
+            <div class="md-ellipsis">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              ComputePods interface generation design
+            </div>
+          </div>
+        </a>
+      
+      
+    </nav>
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-footer-copyright">
+        
+        Made with
+        <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+          Material for MkDocs
+        </a>
+        &bull;
+<a href="https://github.com/lukasgeiter/mkdocs-awesome-pages-plugin/" target="_blank">MkDocs Awesome Pages</a>
+&bull;
+<a href="https://mkdocstrings.github.io/" target="_blank">MkDocStrings</a>
+&bull;
+<a href="https://github.com/fralau/mkdocs-mermaid2-plugin" target="_blank">MkDocs Mermaid2</a>
+&bull;
+<a href="https://www.mkdocs.org" target="_blank">MkDocs</a>
+
+      </div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../assets/javascripts/workers/search.477d984a.min.js", "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.ddd52ceb.min.js"></script>
+      
+    
+  </body>
+</html>
