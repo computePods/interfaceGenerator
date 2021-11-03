@@ -6,12 +6,15 @@ import cpig.loadInterface
 import cpig.generateCode
 import datamodel_code_generator
 import json
+import os
+import sys
 import yaml
 
 def loadConfig(configFile, verbose) :
   config = {
     'options' : {
-      'distDir' : 'dist',
+      'distDir'             : 'dist',
+      'interfacesDir'       : 'interfaces',
       'outputPathTemplates' : {
         'pydantic'              : [ 'python', '{}.py' ],
         'ajv'                   : [ 'js',     '{}_ajv.mjs' ],
@@ -62,6 +65,11 @@ def cli(ctx, configFile, verbose, interface_name):
   config = loadConfig(configFile, verbose)
   config['outputFiles'] = {}
   config['outputDirs']  = {}
+
+  baseInterfacesDir = os.path.dirname(interface_name)
+  if 0 < len(baseInterfacesDir) :
+    os.chdir(baseInterfacesDir)
+  interface_name = os.path.basename(interface_name)
 
   cpig.loadInterface.loadInterfaceFile(interface_name)
 

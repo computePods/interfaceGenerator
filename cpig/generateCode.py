@@ -110,6 +110,12 @@ def getOutputPaths(options, generationType, generationDetails) :
   outputPathTemplate = os.path.join(*outputPathTemplate)
   outputDir = os.path.dirname(outputPathTemplate)
 
+  packageInitFile = os.path.join(outputDir, '__init__.py')
+  if not os.path.isfile(packageInitFile) :
+    os.makedirs(outputDir, exist_ok=True)
+    with open(packageInitFile, 'w') as initFile :
+      initFile.write("# This file makes this directory a Python package\n\n")
+
   return [ outputDir, outputPathTemplate ]
 
 def computeOutputFileNames(config, interfaceDefinition) :
