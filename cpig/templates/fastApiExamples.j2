@@ -2,7 +2,7 @@
 # {{ options['interfaceName'] }} interface.
 
 mountPointRouteParts = {
-  {% for aMountPoint in httpRoutes %}
+  {% for aMountPoint in httpRoutesSorted %}
   "{{ httpRoutes[aMountPoint]['mountPoint'] }}": [{% for aPart in httpRoutes[aMountPoint]['routeParts'] %}
     '{{ aPart }}',{% endfor %}
   ],

@@ -3,13 +3,14 @@
 
 def add{{ options['interfaceName'] }}Interface(appSelf) :
 
-{% for aMountPoint in httpRoutes %}
+{% for aMountPoint in httpRoutesSorted %}
 {%   for anAction in httpRoutes[aMountPoint].actions %}
 
   def {{ anAction | lower }}{{ httpRoutes[aMountPoint].mountPoint | replace('/','_') }}(implFunc):
-    return appSelf.{{ anAction | lower }}(
+    return appSelf.add_api_route(
       '{{ httpRoutes[aMountPoint].mountPoint }}{% if httpRoutes[aMountPoint].routeParts %}/{{ '{' }}{{ httpRoutes[aMountPoint].routeParts | join('}/{') }}{{ '}' }}{% endif %}',
-      implFunc
+      implFunc,
+      methods=["{{ anAction | upper }}"]
     )
 
   appSelf.{{ anAction | lower }}{{ httpRoutes[aMountPoint].mountPoint | replace('/','_') }} = {{ anAction | lower }}{{ httpRoutes[aMountPoint].mountPoint | replace('/','_') }}

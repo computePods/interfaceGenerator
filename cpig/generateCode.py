@@ -299,6 +299,8 @@ def runExampleTemplates(config, interfaceDefinition) :
   if 'httpRoutes' not in interfaceDefinition :
     return
   httpRoutes = interfaceDefinition['httpRoutes']
+  httpRoutesSorted = list(httpRoutes.keys())
+  httpRoutesSorted.sort()
 
   #
   # setup the collection of generators for our use...
@@ -337,10 +339,11 @@ def runExampleTemplates(config, interfaceDefinition) :
     generationDetails['interfaceName'] = interfaceName
     try :
       templateOptions = {
-              'options'     : generationDetails,
-              'outputFiles' : config['outputFiles'],
-              'examples'    : jsonExamples,
-              'httpRoutes'  : httpRoutes,
+              'options'          : generationDetails,
+              'outputFiles'      : config['outputFiles'],
+              'examples'         : jsonExamples,
+              'httpRoutes'       : httpRoutes,
+              'httpRoutesSorted' : httpRoutesSorted,
             }
       #print(yaml.dump(templateOptions))
       renderedStr = theTemplate.render(templateOptions)
@@ -361,6 +364,8 @@ def runHttpRouteTemplates(config, interfaceDefinition) :
   if 'httpRoutes' not in interfaceDefinition :
     return
   httpRoutes = interfaceDefinition['httpRoutes']
+  httpRoutesSorted = list(httpRoutes.keys())
+  httpRoutesSorted.sort()
 
   if 'jsonSchemaDefs' not in interfaceDefinition :
     return
@@ -401,11 +406,12 @@ def runHttpRouteTemplates(config, interfaceDefinition) :
       #print(yaml.dump(config['outputFiles']))
       #print(yaml.dump(rootTypeFiles))
       renderedStr = theTemplate.render({
-        'options'        : generationDetails,
-        'outputFiles'    : config['outputFiles'],
-        'rootTypeFiles'  : rootTypeFiles,
-        'httpRoutes'     : httpRoutes,
-        'jsonSchemaDefs' : jsonSchemaDefs,
+        'options'          : generationDetails,
+        'outputFiles'      : config['outputFiles'],
+        'rootTypeFiles'    : rootTypeFiles,
+        'httpRoutes'       : httpRoutes,
+        'httpRoutesSorted' : httpRoutesSorted,
+        'jsonSchemaDefs'   : jsonSchemaDefs,
       })
       with open(outputPath, 'w') as outFile :
         outFile.write(renderedStr)
