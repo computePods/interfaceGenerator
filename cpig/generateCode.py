@@ -60,6 +60,8 @@ def jsonSchemaGenerator(options, interfaceDefinition) :
     for  aRouteKey, aRoute in httpRoutes.items() :
       if 'response' in aRoute :
         rootTypes[aRoute['response']] = True
+      if 'body' in aRoute :
+        rootTypes[aRoute['body']] = True
 
   if 2 < options['verbose'] :
     print("rootTypes:")
