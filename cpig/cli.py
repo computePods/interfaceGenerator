@@ -107,3 +107,11 @@ def cli(ctx, configFile, verbose, interface_name):
     config,
     cpig.loadInterface.interfaceDescription
   )
+
+  #print("----------------------------------------")
+  #print(yaml.dump(config['options']))
+  with open(
+    os.path.join(config['options']['distDir'], '__init__.py'),
+    "w"
+  ) as initFile :
+    initFile.write("# This file makes this directory a Python package\n\n")
